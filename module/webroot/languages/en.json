@@ -53,5 +53,10 @@
   "about_credits_config": "Config &amp; presets:",
   "home_props_stale": "Not applied this boot",
   "home_props_stale_hint": "The presets ran on an earlier boot but not this one. Check the module is enabled, then reboot.",
-  "home_stat_applied_none": "The presets haven't run this boot."
+  "home_stat_applied_none": "The presets haven't run this boot.",
+  "about_license_title": "License",
+  "about_license_copyright": "Copyright © 2026 poqdavid",
+  "about_license_body": "NyxProps is free software under the GNU Affero General Public License v3.0 (AGPL-3.0-only). You may redistribute and modify it under that license. It comes with ABSOLUTELY NO WARRANTY.",
+  "about_license_where": "License text and notices:",
+  "about_license_source": "Source code:"
 }

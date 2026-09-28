@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.0.1] - 2026-09-28
+
+### ⚖️ License
+
+* **AGPL-3.0-only, stated consistently.** `LICENSE` was already the AGPL-3.0 text, but the README said GPL-3.0; it now says AGPL-3.0-only.
+* **Notices:** added `NOTICE.md`, which credits the projects NyxProps builds on and the licenses of its bundled files (resetprop-rs: MIT; two WebUI icons: Apache-2.0). `LICENSE` and `NOTICE.md` now ship inside the module zip.
+* **About screen:** now shows the copyright, the license, the no-warranty notice and where to find the source.
+
 ## [v1.0.0] - 2026-09-28
 
 ### 📝 Notes

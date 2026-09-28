@@ -7,6 +7,7 @@ name: Build
 #
 #   module/                 <- all flashable files (module.prop + verify.sh at its root)
 #   scripts/gen-hashes.sh   <- writes per-file .sha256 sidecars at build time
+#   LICENSE, NOTICE.md      <- copied into the zip at build time
 #   update.json             <- refreshed automatically on tagged releases
 #   .github/workflows/build.yml
 #
@@ -63,6 +64,12 @@ jobs:
                     echo "::error::tag '${{ github.ref_name }}' != module.prop version '${{ steps.mod.outputs.version }}'"
                     exit 1
                   fi
+
+            - name: Bundle license and notices
+              # AGPL-3.0 has to travel with the program, so the flashable zip
+              # carries its own copy. Copied at build time so the repo keeps a
+              # single LICENSE / NOTICE.md (the copies are git-ignored).
+              run: cp LICENSE NOTICE.md module/
 
             - name: Generate per-file integrity hashes
               run: sh scripts/gen-hashes.sh module

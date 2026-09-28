@@ -78,13 +78,16 @@ Changing system properties can confuse apps or the system itself. Please make su
 
 ## 🌟 Special Thanks
 
-| 🔧 **Project**    | 👨‍💻 **Developer** | 🔗 **Link**                                              |
-| ---------------- | ----------------- | -------------------------------------------------------- |
-| **KernelSU**     | tiann             | [GitHub](https://github.com/tiann/KernelSU)              |
-| **KernelSU-Next**| rifsxd            | [GitHub](https://github.com/KernelSU-Next/KernelSU-Next) |
-| **Magisk**       | topjohnwu         | [GitHub](https://github.com/topjohnwu/Magisk)            |
-| **resetprop-rs** | Enginex0          | [GitHub](https://github.com/Enginex0/resetprop-rs)       |
-| **BRENE**        | rrr333nnn333      | [GitHub](https://github.com/rrr333nnn333/BRENE)          |
+| 🔧 **Project**        | 👨‍💻 **Developer** | 🔗 **Link**                                              |
+| -------------------- | ----------------- | -------------------------------------------------------- |
+| **KernelSU**         | tiann             | [GitHub](https://github.com/tiann/KernelSU)              |
+| **KernelSU-Next**    | rifsxd            | [GitHub](https://github.com/KernelSU-Next/KernelSU-Next) |
+| **Magisk**           | topjohnwu         | [GitHub](https://github.com/topjohnwu/Magisk)            |
+| **resetprop-rs**     | Enginex0          | [GitHub](https://github.com/Enginex0/resetprop-rs)       |
+| **BRENE**            | rrr333nnn333      | [GitHub](https://github.com/rrr333nnn333/BRENE)          |
+| **ksu_module_susfs** | sidex15           | [GitHub](https://github.com/sidex15/ksu_module_susfs)    |
+
+*The set of props the presets cover follows BRENE's. See [NOTICE.md](NOTICE.md) for what comes from where.*
 
 *If you have contributed and are not listed here, please remind me!* 🙏
 
@@ -92,7 +95,7 @@ Changing system properties can confuse apps or the system itself. Please make su
 
 ## 📄 License
 
-NyxProps is released under the [GNU General Public License v3.0](LICENSE). The bundled resetprop-rs binaries are MIT-licensed; see `module/LICENSE.resetprop-rs`.
+NyxProps is released under the [GNU Affero General Public License v3.0](LICENSE) (`AGPL-3.0-only`). Bundled third-party files keep their own licenses (resetprop-rs: MIT; two WebUI icons: Apache-2.0); see [NOTICE.md](NOTICE.md).
 
 ---
 

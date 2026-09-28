@@ -1,4 +1,4 @@
-import { getModuleProp, getConfig, setConfigValue, PERSISTENT_DIR } from '../props-data.js';
+import { getModuleProp, getConfig, setConfigValue, PERSISTENT_DIR, MOD_DIR } from '../props-data.js';
 import { applyTheme, applyMonet, monetAvailable } from '../theme.js';
 import { applyFullscreen, fullScreenAvailable } from '../fullscreen.js';
 import { t } from '../i18n.js';
@@ -53,6 +53,13 @@ export function renderAboutShell(root) {
 			<p style="margin:0 0 8px;">${t('about_credits_brene', "A number of the prop-spoofing ideas were sparked by studying <strong>BRENE</strong> by <strong>rrr333nnn333</strong>. The ideas were reimplemented in Nyx's own way, but the inspiration deserves a shout-out.")}</p>
 			<p style="margin:0 0 8px;">${t('about_credits_poqdavid', 'The WebUI, the preset system and the glue I built myself, with love for the community. Issues and translations welcome.')}</p>
 			<p style="margin:0; color: var(--md-on-surface-variant); font-size: 13px;">${t('about_credits_config', 'Config &amp; presets:')} <code>${PERSISTENT_DIR}</code></p>
+		</div>
+
+		<h2 class="section-title">${t('about_license_title', 'License')}</h2>
+		<div class="card">
+			<p style="margin:0 0 8px;">${t('about_license_copyright', 'Copyright © 2026 poqdavid')}</p>
+			<p style="margin:0 0 8px;">${t('about_license_body', 'NyxProps is free software under the GNU Affero General Public License v3.0 (AGPL-3.0-only). You may redistribute and modify it under that license. It comes with ABSOLUTELY NO WARRANTY.')}</p>
+			<p style="margin:0; color: var(--md-on-surface-variant); font-size: 13px;">${t('about_license_where', 'License text and notices:')} <code>${MOD_DIR}/LICENSE</code>, <code>NOTICE.md</code><br>${t('about_license_source', 'Source code:')} <code>github.com/poqdavid/nyxprops</code></p>
 		</div>
 	`;
 
