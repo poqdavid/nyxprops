@@ -1,0 +1,16 @@
+# name: Verified boot state
+# description: Reports the bootloader as locked with verity enforcing, and clears the MediaTek orange-state marker.
+# enabled: 1
+
+missing_match  ro.boot.verifiedbootstate       green
+missing_match  ro.boot.flash.locked            1
+missing_match  ro.boot.veritymode              enforcing
+reset          vendor.boot.verifiedbootstate   green
+
+# MediaTek's own unlocked-bootloader marker. "Orange state" is the AVB
+# state name for an unlocked device, and MTK platforms expose it as its
+# own prop alongside the standard ones above - so a detector reading
+# only this one still sees an unlocked device even with
+# ro.boot.verifiedbootstate spoofed to green. Relevant on MT6789 and
+# other MTK SoCs; absent (and therefore a no-op) elsewhere.
+reset          ro.is_ever_orange               0

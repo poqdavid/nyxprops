@@ -1,0 +1,7 @@
+# name: Recovery bootmode
+# description: Masks having booted from recovery. Uses 'contains', so only values that actually mention recovery are rewritten.
+# enabled: 1
+
+contains  ro.bootmode           recovery  unknown
+contains  ro.boot.bootmode      recovery  unknown
+contains  vendor.boot.bootmode  recovery  unknown
