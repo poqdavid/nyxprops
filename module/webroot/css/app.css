@@ -1,0 +1,490 @@
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+
+/* ---------- Window insets ----------
+   The manager's WebView is edge-to-edge, because tokens.css imports
+   mui.kernelsu.org/internal/insets.css and requesting that file makes
+   KernelSU enable edge-to-edge and stop padding the WebView itself. The
+   system bars are therefore drawn OVER the page and the module owns its
+   own insets.
+
+   With fullscreen on the bars are hidden, so both values are 0 and none
+   of this matters - which is why no inset handling existed while
+   fullscreen was hardcoded on. Switch it off and the top bar would
+   otherwise sit underneath the status bar.
+
+   Gated on data-fullscreen rather than trusting --window-inset-* to drop
+   to zero when the bars hide: if KernelSU computes them once at load, an
+   ungated rule would leave a phantom gap the moment fullscreen came back
+   on. env() is the fallback for hosts that serve no insets.css, and the
+   var() chain is used instead of max() on purpose - a max() mixing a
+   unitless 0 with a length is invalid and would take the whole
+   declaration down with it. */
+:root {
+	--nyx-inset-top: 0px;
+	--nyx-inset-bottom: 0px;
+}
+:root[data-fullscreen="off"] {
+	--nyx-inset-top: var(--window-inset-top, env(safe-area-inset-top, 0px));
+	--nyx-inset-bottom: var(--window-inset-bottom, env(safe-area-inset-bottom, 0px));
+}
+
+body {
+	font: var(--md-type-body-md);
+	background: var(--md-background);
+	color: var(--md-on-background);
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	overscroll-behavior-y: contain;
+}
+
+/* ---------- Top app bar ---------- */
+.top-bar {
+	position: sticky;
+	top: 0;
+	z-index: 10;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: var(--nyx-inset-top) 16px 0;
+	/* box-sizing is border-box, so the inset has to be added to the
+	   height or it would eat into the 64px bar instead of sitting
+	   above it. */
+	height: calc(64px + var(--nyx-inset-top));
+	background: var(--md-surface);
+	border-bottom: 1px solid var(--md-outline-variant);
+}
+.top-bar__title { font: var(--md-type-title-lg); flex: 1; }
+.icon-btn {
+	width: 40px; height: 40px; border-radius: var(--md-shape-full);
+	border: none; background: transparent; color: var(--md-on-surface-variant);
+	display: flex; align-items: center; justify-content: center;
+	cursor: pointer;
+}
+.icon-btn:hover { background: color-mix(in srgb, var(--md-on-surface) 8%, transparent); }
+.icon-btn svg { width: 24px; height: 24px; fill: currentColor; }
+
+/* ---------- Page container ---------- */
+main {
+	flex: 1;
+	padding: 16px 16px calc(96px + var(--nyx-inset-bottom));
+	max-width: 640px;
+	width: 100%;
+	margin: 0 auto;
+}
+.page { display: none; animation: fade .15s ease-out; }
+.page.active { display: block; }
+@keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+.section-title {
+	font: var(--md-type-title-md);
+	color: var(--md-on-surface-variant);
+	margin: 24px 4px 8px;
+}
+.section-title:first-child { margin-top: 4px; }
+
+/* ---------- Bottom navigation ---------- */
+.nav-bar {
+	position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
+	display: flex;
+	background: var(--md-surface-container);
+	border-top: 1px solid var(--md-outline-variant);
+	padding: 8px 0 max(8px, var(--nyx-inset-bottom));
+}
+.nav-item {
+	flex: 1; border: none; background: none; cursor: pointer;
+	display: flex; flex-direction: column; align-items: center; gap: 4px;
+	color: var(--md-on-surface-variant);
+	font: var(--md-type-label-md);
+	padding: 4px 0;
+}
+.nav-item svg { width: 24px; height: 24px; fill: currentColor; }
+.nav-item .pill {
+	padding: 2px 20px; border-radius: var(--md-shape-full);
+	transition: background .15s ease;
+}
+.nav-item[aria-current="page"] { color: var(--md-on-secondary-container); }
+.nav-item[aria-current="page"] .pill { background: var(--md-secondary-container); }
+
+/* ---------- Cards ---------- */
+.card {
+	background: var(--md-surface-container-low);
+	border-radius: var(--md-shape-lg);
+	padding: 16px;
+	margin-bottom: 12px;
+}
+.card--outlined { background: transparent; border: 1px solid var(--md-outline-variant); }
+
+/* ---------- Stat grid (home) ---------- */
+.stat-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 12px;
+}
+.stat-card {
+	background: var(--md-surface-container-low);
+	border-radius: var(--md-shape-lg);
+	padding: 16px;
+	text-align: left;
+	border: none;
+	cursor: pointer;
+	color: inherit;
+	font: inherit;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	transition: background .15s ease;
+}
+.stat-card:active { background: var(--md-surface-container-high); }
+.stat-card__value { font: 500 34px/40px 'Roboto', system-ui, sans-serif; color: var(--md-primary); }
+.stat-card__label { font: var(--md-type-label-lg); color: var(--md-on-surface-variant); }
+
+.status-card {
+	display: flex; align-items: center; gap: 16px;
+	background: var(--md-primary-container);
+	color: var(--md-on-primary-container);
+	border-radius: var(--md-shape-xl);
+	padding: 20px;
+	margin-bottom: 16px;
+}
+.status-card.is-error { background: var(--md-error-container); color: var(--md-on-error-container); }
+
+/* ---------- Notice card ----------
+   Lower-key than .status-card: it reports something optional (a binary
+   update) rather than the module's own state, so it must not compete
+   with "SuSFS active" directly above it. */
+.notice-card {
+	display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+	background: var(--md-surface-container-high);
+	color: var(--md-on-surface);
+	border: 1px solid var(--md-outline-variant);
+	border-radius: var(--md-shape-lg);
+	padding: 16px;
+	margin-bottom: 16px;
+}
+.notice-card.is-warn {
+	background: var(--md-tertiary-container);
+	color: var(--md-on-tertiary-container);
+	border-color: transparent;
+}
+.notice-card__text { flex: 1 1 200px; min-width: 0; }
+.notice-card__title { font: var(--md-type-title-md); }
+.notice-card__subtitle {
+	font: var(--md-type-body-md);
+	opacity: .85;
+	margin-top: 2px;
+	/* Commit messages are arbitrary text and can contain a long
+	   unbroken token. */
+	overflow-wrap: anywhere;
+}
+.notice-card__action { flex: none; }
+.status-card__icon { width: 40px; height: 40px; flex: none; }
+.status-card__title { font: var(--md-type-title-md); }
+.status-card__subtitle { font: var(--md-type-body-md); opacity: .85; margin-top: 2px; }
+
+/* ---------- Home: verification (check) + device (info) rows ---------- */
+.check-row, .info-row {
+	display: flex; align-items: center; gap: 12px;
+	padding: 12px 0; border-bottom: 1px solid var(--md-outline-variant);
+}
+.check-row:last-child, .info-row:last-child { border-bottom: none; }
+.check-row__label, .info-row__label {
+	flex: 1 1 auto; min-width: 0;
+	color: var(--md-on-surface); font: var(--md-type-body-lg);
+}
+.check-row__value {
+	color: var(--md-on-surface-variant); font: var(--md-type-body-md);
+}
+.info-row__value {
+	flex: 0 1 auto; text-align: right; word-break: break-word;
+	color: var(--md-on-surface-variant); font: var(--md-type-body-md);
+}
+.check-row__mark { width: 20px; height: 20px; flex: none; display: inline-flex; }
+.check-row__mark svg { width: 100%; height: 100%; fill: currentColor; }
+.check-row__mark.is-ok { color: var(--md-success); }
+.check-row__mark.is-warn { color: var(--md-error); }
+.tag-inline {
+	display: inline-block; margin-left: 6px; padding: 1px 8px;
+	border-radius: var(--md-shape-full); font: var(--md-type-label-md);
+	background: var(--md-tertiary-container); color: var(--md-on-tertiary-container);
+	vertical-align: middle; white-space: nowrap;
+}
+
+/* ---------- Settings rows ---------- */
+.setting-row {
+	display: flex; align-items: center; gap: 16px;
+	padding: 14px 4px;
+	border-bottom: 1px solid var(--md-outline-variant);
+}
+.setting-row:last-child { border-bottom: none; }
+.setting-row__text { flex: 1; min-width: 0; }
+.setting-row__title { font: var(--md-type-body-lg); }
+.setting-row__desc { font: var(--md-type-body-md); color: var(--md-on-surface-variant); margin-top: 2px; }
+
+/* Rows whose control is a dropdown stack vertically: title, then the
+   full description, then the control full-width beneath it. Side-by-side
+   flex (the default) squeezes a long description into a tall narrow
+   column with the control stranded mid-height beside it. */
+.setting-row--stacked {
+	flex-direction: column;
+	align-items: stretch;
+	gap: 12px;
+}
+.setting-row--stacked .setting-row__text { flex: none; }
+.select-field--block { width: 100%; box-sizing: border-box; }
+
+/* M3-style switch, hand rolled (no external component library) */
+.m3-switch { position: relative; width: 52px; height: 32px; flex: none; }
+.m3-switch input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; z-index: 1; }
+.m3-switch__track {
+	position: absolute; inset: 0; border-radius: var(--md-shape-full);
+	background: var(--md-surface-container-highest);
+	border: 2px solid var(--md-outline);
+	transition: background .15s ease, border-color .15s ease;
+}
+.m3-switch__thumb {
+	position: absolute; top: 50%; left: 4px; width: 16px; height: 16px;
+	border-radius: 50%; background: var(--md-outline);
+	transform: translate(0,-50%);
+	transition: transform .15s ease, width .15s ease, height .15s ease, background .15s ease, left .15s ease;
+}
+.m3-switch input:checked ~ .m3-switch__track { background: var(--md-primary); border-color: var(--md-primary); }
+.m3-switch input:checked ~ .m3-switch__thumb {
+	background: var(--md-on-primary); width: 24px; height: 24px; left: 24px;
+}
+
+.select-field {
+	appearance: none;
+	background: var(--md-surface-container-high);
+	color: var(--md-on-surface);
+	border: 1px solid var(--md-outline);
+	border-radius: var(--md-shape-sm);
+	padding: 8px 32px 8px 12px;
+	font: var(--md-type-body-md);
+}
+
+textarea.list-editor {
+	width: 100%;
+	min-height: 140px;
+	background: var(--md-surface-container-high);
+	color: var(--md-on-surface);
+	border: 1px solid var(--md-outline-variant);
+	border-radius: var(--md-shape-md);
+	padding: 12px;
+	font: 13px/1.5 ui-monospace, 'Roboto Mono', monospace;
+	resize: vertical;
+}
+
+.btn {
+	border: none; border-radius: var(--md-shape-full);
+	padding: 10px 20px; font: var(--md-type-label-lg);
+	cursor: pointer;
+}
+.btn--filled { background: var(--md-primary); color: var(--md-on-primary); }
+.btn--tonal { background: var(--md-secondary-container); color: var(--md-on-secondary-container); }
+.btn--text { background: transparent; color: var(--md-primary); }
+.btn.is-busy { cursor: progress; opacity: .9; }
+.btn[disabled] { cursor: default; }
+/* Spinner uses currentColor so it matches the button's text in either theme,
+   and animates transform only, which the compositor can keep turning even
+   while the main thread is busy running the check. */
+.btn__spinner {
+	display: inline-block; width: 1em; height: 1em;
+	margin-right: 8px; vertical-align: -0.15em;
+	border: 2px solid currentColor; border-right-color: transparent;
+	border-radius: 50%;
+	animation: nyx-spin .7s linear infinite;
+}
+@keyframes nyx-spin { to { transform: rotate(360deg); } }
+/* Keep the spinner (it conveys progress) but ease it for reduced-motion. */
+@media (prefers-reduced-motion: reduce) { .btn__spinner { animation-duration: 1.5s; } }
+
+/* ---------- Chips (feature list on About) ---------- */
+.chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.chip {
+	font: var(--md-type-label-md);
+	background: var(--md-secondary-container);
+	color: var(--md-on-secondary-container);
+	padding: 6px 12px; border-radius: var(--md-shape-full);
+}
+
+/* ---------- Bottom sheet ---------- */
+.sheet-scrim {
+	position: fixed; inset: 0; background: color-mix(in srgb, var(--md-scrim) 40%, transparent);
+	opacity: 0; pointer-events: none; transition: opacity .15s ease; z-index: 20;
+}
+.sheet-scrim.open { opacity: 1; pointer-events: auto; }
+.sheet {
+	position: fixed; left: 0; right: 0; bottom: 0; z-index: 21;
+	background: var(--md-surface-container-low);
+	border-radius: var(--md-shape-xl) var(--md-shape-xl) 0 0;
+	max-height: 70vh;
+	display: flex; flex-direction: column;
+	transform: translateY(100%);
+	transition: transform .2s ease;
+}
+.sheet.open { transform: translateY(0); }
+.sheet__handle {
+	width: 32px; height: 4px; border-radius: var(--md-shape-full);
+	background: var(--md-outline-variant); margin: 12px auto 4px;
+}
+.sheet__header { padding: 4px 20px 12px; font: var(--md-type-title-md); display: flex; justify-content: space-between; align-items: center; }
+.sheet__body { overflow-y: auto; padding: 0 20px 20px; }
+.sheet__empty { color: var(--md-on-surface-variant); padding: 24px 0; text-align: center; }
+.sheet__list { list-style: none; margin: 0; padding: 0; }
+.sheet__list li {
+	font: 13px/1.5 ui-monospace, 'Roboto Mono', monospace;
+	padding: 8px 0; border-bottom: 1px solid var(--md-outline-variant);
+	word-break: break-all;
+}
+.sheet__list li:last-child { border-bottom: none; }
+
+.empty-hint { color: var(--md-on-surface-variant); text-align: center; padding: 32px 16px; }
+
+/* ---------- Dialogs (in-page confirm/prompt) ---------- */
+.dialog-scrim {
+	position: fixed; inset: 0; z-index: 30;
+	background: color-mix(in srgb, var(--md-scrim) 40%, transparent);
+	display: flex; align-items: center; justify-content: center;
+	padding: 24px;
+	opacity: 0; pointer-events: none; transition: opacity .15s ease;
+}
+.dialog-scrim.open { opacity: 1; pointer-events: auto; }
+.dialog {
+	background: var(--md-surface-container-high);
+	color: var(--md-on-surface);
+	border-radius: var(--md-shape-xl);
+	padding: 24px;
+	width: 100%; max-width: 360px;
+	box-shadow: var(--md-elevation-3);
+	transform: scale(.95); transition: transform .15s ease;
+}
+.dialog-scrim.open .dialog { transform: scale(1); }
+.dialog__title { font: var(--md-type-title-lg); margin: 0 0 12px; }
+/* pre-line so a message built from several paragraphs keeps its breaks;
+   single-line messages are unaffected. */
+.dialog__body { font: var(--md-type-body-md); color: var(--md-on-surface-variant); margin: 0 0 16px; white-space: pre-line; }
+.dialog__input {
+	width: 100%;
+	background: var(--md-surface-container-lowest);
+	color: var(--md-on-surface);
+	border: 1px solid var(--md-outline);
+	border-radius: var(--md-shape-sm);
+	padding: 12px;
+	font: var(--md-type-body-lg);
+	margin-bottom: 8px;
+}
+.dialog__actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
+
+.sheet__group {
+	font: var(--md-type-label-lg);
+	color: var(--md-on-surface-variant);
+	padding: 12px 0 4px;
+	border-bottom: 1px solid var(--md-outline-variant);
+	margin-bottom: 4px;
+}
+
+/* ---------- Paths section ----------
+   Deliberately NOT built on .setting-row: that's display:flex, which laid
+   the filename, hint, textarea and buttons out side by side and squeezed
+   the editor into a narrow column. */
+.path-card { padding: 0; }
+
+.path-card__head {
+	display: flex; align-items: center; gap: 12px;
+	width: 100%; padding: 16px;
+	background: none; border: none; cursor: pointer;
+	color: inherit; font: inherit; text-align: left;
+}
+.path-card__chevron { color: var(--md-on-surface-variant); font-size: 12px; flex: none; }
+.path-card__text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.path-card__name { font: 500 15px/20px ui-monospace, 'Roboto Mono', monospace; }
+.path-card__desc { font: var(--md-type-body-md); color: var(--md-on-surface-variant); }
+.path-card__count {
+	flex: none;
+	font: var(--md-type-label-lg);
+	color: var(--md-on-secondary-container);
+	background: var(--md-secondary-container);
+	border-radius: var(--md-shape-full);
+	padding: 2px 12px;
+}
+
+.path-card__body { padding: 0 16px 16px; }
+.path-card__hint {
+	font: var(--md-type-body-md);
+	color: var(--md-on-surface-variant);
+	margin: 0 0 12px;
+}
+.path-card__warn {
+	font: var(--md-type-body-md);
+	color: var(--md-on-error-container);
+	background: var(--md-error-container);
+	border-radius: var(--md-shape-sm);
+	padding: 10px 12px;
+	margin: 10px 0 0;
+}
+.path-card__actions {
+	display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px;
+}
+
+/* The editor is the point of this screen, so give it real room: about
+   half the viewport, and horizontal scrolling instead of wrapping so long
+   paths stay on one line and stay readable. */
+.path-card__body .list-editor {
+	min-height: 48vh;
+	resize: vertical;
+	white-space: pre;
+	overflow-wrap: normal;
+	overflow-x: auto;
+	line-height: 1.6;
+	tab-size: 4;
+}
+
+/* Five destinations need slightly tighter labels to avoid wrapping. */
+.nav-item { font-size: 11px; }
+.nav-item .pill { padding: 2px 14px; }
+
+/* ---------- Soft keyboard ----------
+   Driven by data-editing (set on focus), NOT by keyboard detection: in an
+   edge-to-edge activity the IME is drawn over the window without resizing
+   it, so the page cannot tell the keyboard is there. Everything below
+   works whether or not it can. */
+
+/* Keeps a field clear of the sticky 64px top bar when scrolled to top. */
+.list-editor,
+.dialog__input,
+input.select-field {
+	scroll-margin-top: calc(80px + var(--nyx-inset-top));
+}
+
+/* The room that makes "scroll the field to the top" actually possible. A
+   field near the end of the page has nothing below it to scroll against,
+   so without this the browser simply refuses to move. Removed again on
+   blur, so it never affects normal layout. */
+:root[data-editing="on"] main {
+	padding-bottom: 80vh;
+}
+
+.nav-bar { transition: transform .2s ease; }
+:root[data-editing="on"] .nav-bar {
+	transform: translateY(100%);
+	pointer-events: none;
+}
+
+/* A half-screen editor plus a keyboard leaves almost nothing readable. */
+:root[data-editing="on"] .path-card__body .list-editor { min-height: 26vh; }
+:root[data-editing="on"] .sheet__body .list-editor,
+:root[data-editing="on"] details .list-editor { min-height: 26vh; }
+
+/* A centred dialog sits right where the keyboard appears, so move it up
+   while typing. */
+:root[data-editing="on"] .dialog-scrim {
+	align-items: flex-start;
+	padding-top: 10vh;
+}
+
+/* When the host DOES report the keyboard (adjustResize managers), use the
+   real measurement to lift fixed overlays. Harmless at 0px otherwise. */
+:root[data-keyboard="open"] .sheet { bottom: var(--kb-height, 0px); }
+:root[data-keyboard="open"] .dialog-scrim { bottom: var(--kb-height, 0px); }

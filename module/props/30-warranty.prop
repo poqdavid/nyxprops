@@ -1,0 +1,8 @@
+# name: Warranty bit
+# description: Clears the warranty/KNOX-style tripped flags.
+# enabled: 1
+
+missing_match  ro.boot.warranty_bit         0
+reset          ro.warranty_bit              0
+reset          ro.vendor.boot.warranty_bit  0
+reset          ro.vendor.warranty_bit       0

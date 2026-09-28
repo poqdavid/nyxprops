@@ -1,0 +1,24 @@
+# name: Build fingerprint
+# description: Rewrites userdebug to user in ro.build.fingerprint and strips custom-ROM names from it. OFF by default - read the warning below before enabling.
+# enabled: 0
+
+# WARNING, and the reason this ships disabled:
+#   Stripping a ROM name out of a fingerprint leaves the rest behind,
+#   so "lineage_a15x/..." becomes "_a15x/...". That is a malformed
+#   fingerprint, and a malformed fingerprint is more suspicious than an
+#   honest one - attestation compares it against Google's list of real
+#   builds. The fork does the same thing; it is inherited behaviour,
+#   not an improvement.
+#
+#   On a stock ROM none of these needles are present, so every rule
+#   below is a no-op and enabling this changes nothing. It is only
+#   worth turning on if you have checked what your fingerprint actually
+#   becomes:
+#       resetprop ro.build.fingerprint
+#
+# 'replace' rewrites a substring of the existing value and never
+# creates the prop. Omitting the last field deletes the substring.
+replace  ro.build.fingerprint  userdebug  user
+replace  ro.build.fingerprint  evolution
+replace  ro.build.fingerprint  crdroid
+replace  ro.build.fingerprint  lineage

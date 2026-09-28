@@ -1,0 +1,11 @@
+# name: Build type
+# description: Reports a user build signed with release-keys instead of userdebug/test-keys.
+# enabled: 1
+
+reset  ro.build.type  user
+reset  ro.build.tags  release-keys
+
+# Some ROMs and vendor blobs read ro.build.keys instead of
+# ro.build.tags. Leaving it at test-keys while ro.build.tags says
+# release-keys is an inconsistency worth closing.
+reset  ro.build.keys  release-keys

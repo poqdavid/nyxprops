@@ -1,0 +1,5 @@
+# name: Mock location
+# description: Reports mock locations as disallowed. Its own preset because anyone deliberately using a location-spoofing app wants this off while keeping the other presets on.
+# enabled: 1
+
+reset  ro.allow.mock.location  0

@@ -1,0 +1,5 @@
+# name: Verified boot hash (advanced)
+# description: Pin ro.boot.vbmeta.digest to a specific value. Fill a real known-good digest into the rule line below, remove its leading '# ', and set 'enabled: 1'. A wrong or blank value is worse than the device's own, so this ships disabled with the rule commented - enabling alone does nothing until you edit it.
+# enabled: 0
+
+# missing_match  ro.boot.vbmeta.digest  PASTE_YOUR_DIGEST_HERE

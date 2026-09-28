@@ -1,0 +1,6 @@
+# name: Security patch level
+# description: Report a current security patch date, so a stale one on a custom ROM isn't a flag. OS -> current YYYY-MM-01, vendor -> YYYY-MM-05. Off by default: a patch date newer than this build's fingerprint is itself an inconsistency, so enable knowingly. 'reset' only rewrites a prop that already exists and differs.
+# enabled: 0
+
+reset  ro.build.version.security_patch  {security_patch}
+reset  ro.vendor.build.security_patch   {yyyy_mm}-05

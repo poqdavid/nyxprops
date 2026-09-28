@@ -1,0 +1,5 @@
+# name: Emulator / cloud phone
+# description: Blanks the qemu marker some detection libraries read to spot emulators.
+# enabled: 1
+
+clear  ro.kernel.qemu

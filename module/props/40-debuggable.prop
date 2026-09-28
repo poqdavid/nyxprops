@@ -1,0 +1,8 @@
+# name: Debuggable / secure
+# description: Presents the build as a non-debuggable, secure production build.
+# enabled: 1
+
+reset  ro.debuggable        0
+reset  ro.force.debuggable  0
+reset  ro.secure            1
+reset  ro.adb.secure        1

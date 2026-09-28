@@ -1,0 +1,10 @@
+# Build artifacts
+*.sha256
+*.zip
+build/
+out/
+node_modules/
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db

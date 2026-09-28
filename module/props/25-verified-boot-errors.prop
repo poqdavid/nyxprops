@@ -1,0 +1,12 @@
+# name: Verified boot errors
+# description: Removes the AVB error/diagnostic props some devices leave behind. These are deleted rather than blanked - for a prop like this, existing at all is the signal.
+# enabled: 1
+
+# 'delete' is not 'clear'. Blanking these leaves a present prop with an
+# empty value, which on a device that booted cleanly would never exist
+# in the first place. Removing them is what a verified boot actually
+# looks like.
+delete  ro.boot.verifiedbooterror
+delete  ro.boot.verifyerrorpart
+delete  vendor.boot.verifyerrorpart
+delete  vendor.boot.verifiedbooterror

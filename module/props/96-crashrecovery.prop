@@ -1,0 +1,5 @@
+# name: Crash recovery counter
+# description: Removes the Android 15+ crashrecovery rescue-boot counter, which is non-zero only after a boot loop. A no-op on devices that don't have it.
+# enabled: 1
+
+delete  crashrecovery.rescue_boot_count

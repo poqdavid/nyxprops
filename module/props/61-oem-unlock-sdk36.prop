@@ -1,0 +1,10 @@
+# name: OEM unlock (SDK 36+)
+# description: On Android 16 and up, sys.oem_unlock_allowed is deleted rather than set to 0, because from that release the prop's presence is what gets read.
+# enabled: 1
+# min_sdk: 36
+
+# AOSP changed the framework's handling of this prop, so zeroing it is
+# no longer the right shape - the prop existing at all is the signal.
+# This preset and 60-oem-unlock.prop are gated to disjoint SDK ranges,
+# so exactly one of them runs on any given device.
+delete  sys.oem_unlock_allowed

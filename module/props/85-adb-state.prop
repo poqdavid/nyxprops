@@ -1,0 +1,25 @@
+# name: ADB state
+# description: Masks a live adbd. Runs at boot-completed, because init has not written these props yet at the service stage. Turn it off if you rely on tooling that reads adb state props.
+# enabled: 1
+# stage: boot-completed
+
+# Why '# stage: boot-completed':
+#   init writes init.svc.* and service.adb.* as those services start, so
+#   at the service stage they either do not exist yet or are about to be
+#   overwritten. 'reset' never creates a prop, so these rules would be
+#   silent no-ops there. This is the one group in the fork's prop set
+#   that genuinely needs the later stage.
+#
+# Scope, so nobody is surprised:
+#   Nothing here stops adbd. These are prop spoofs only, and none of
+#   them persist past a reboot. A running adbd keeps working and an
+#   active ADB session is not dropped.
+#
+#   What can notice: tooling that reads adb state from these props
+#   rather than asking adbd. If you develop against this device and
+#   something starts reporting ADB as unavailable, this preset is the
+#   first thing to turn off.
+reset   init.svc.adbd            stopped
+clear   init.svc_debug_pid.adbd
+delete  service.adb.root
+delete  service.adb.tcp.port

@@ -1,0 +1,7 @@
+# name: Vendor-specific (Xiaomi / Realme)
+# description: Lock-state props used by MIUI/HyperOS and Realme UI. Harmless on other brands - 'reset' never creates a prop the device doesn't already have, so this is a no-op on e.g. Samsung.
+# enabled: 1
+
+reset  ro.secureboot.lockstate   locked
+reset  ro.boot.realmebootstate   green
+reset  ro.boot.realme.lockstate  1

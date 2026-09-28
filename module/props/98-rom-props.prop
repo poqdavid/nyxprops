@@ -1,0 +1,38 @@
+# name: Custom ROM props
+# description: Removes props that name the custom ROM you are running. OFF by default - the name pattern needs checking against your own device first.
+# enabled: 0
+
+# ro.modversion carries the ROM version string on most custom ROMs.
+delete  ro.modversion
+
+# 'delete_matching' takes an ERE and removes every existing prop whose
+# NAME matches it.
+#
+# Two deliberate differences from the fork here:
+#
+#   1. Name only. The fork greps the whole "[name]: [value]" dump line,
+#      so a prop whose *value* happens to contain one of these words is
+#      deleted too. With 20 common words in the pattern that is an
+#      unpredictable blast radius on a stock ROM, for no gain.
+#
+#   2. Anchored and dotted (^ro\.lineage\. rather than bare lineage),
+#      so it matches a ROM's own prop namespace instead of any prop
+#      with the word somewhere in its name.
+#
+# Because of those two, the full 22-name list is safe to carry here -
+# the anchoring is what makes the breadth harmless. Kept off by default
+# anyway: a ROM's own apps and services may read these props, and the
+# fork defaults its equivalent (config_rom_props) to 0 for the same
+# reason. This list mirrors the custom-ROM name set NyxSUSFS's
+# hide_cusrom uses (boot-completed.sh in the NyxSUSFS repo).
+#
+# Check what a pattern would remove BEFORE enabling this preset:
+#     resetprop | sed -n 's/^\[\([^]]*\)\]: .*/\1/p' | grep -E '<pattern>'
+delete_matching  ^ro\.(lineage|infinity|evolution|crdroid|mistos|axion|pixelos|rising|lunaris|halcyon|havoc|alphadroid|bliss|calyx|derpfest|graphene|lmodroid|lumine|matrixx|clover|yaap|aospa)\.
+
+# NOT included, on purpose: the fork also sweeps props matching
+# pihook|pixelprops|spoof and deletes them with -p, which erases them
+# from /data/property permanently rather than just for this boot. That
+# would quietly destroy the config of any Play Integrity module you
+# have installed, and it is not reversible by rebooting. If you want
+# it, add it here yourself knowing that.

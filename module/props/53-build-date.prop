@@ -1,0 +1,26 @@
+# name: Build date consistency
+# description: Copy this device's own ro.build.date / ro.build.date.utc to every per-partition variant, so they can't disagree (a cross-partition mismatch is itself a signal). 'same_as' reads the source prop's live value and only writes a target that already exists, so a partition the device lacks is never invented. Off by default.
+# enabled: 0
+
+# --- UTC (unix timestamp) variants ---
+same_as  ro.bootimage.build.date.utc    ro.build.date.utc
+same_as  ro.odm.build.date.utc          ro.build.date.utc
+same_as  ro.odm_dlkm.build.date.utc     ro.build.date.utc
+same_as  ro.product.build.date.utc      ro.build.date.utc
+same_as  ro.system.build.date.utc       ro.build.date.utc
+same_as  ro.system_dlkm.build.date.utc  ro.build.date.utc
+same_as  ro.system_ext.build.date.utc   ro.build.date.utc
+same_as  ro.vendor.build.date.utc       ro.build.date.utc
+same_as  ro.vendor_dlkm.build.date.utc  ro.build.date.utc
+same_as  persist.vendor.build.date.utc  ro.build.date.utc
+
+# --- human-readable variants (multi-word values; same_as handles them) ---
+same_as  ro.bootimage.build.date        ro.build.date
+same_as  ro.odm.build.date              ro.build.date
+same_as  ro.odm_dlkm.build.date         ro.build.date
+same_as  ro.product.build.date          ro.build.date
+same_as  ro.system.build.date           ro.build.date
+same_as  ro.system_dlkm.build.date      ro.build.date
+same_as  ro.system_ext.build.date       ro.build.date
+same_as  ro.vendor.build.date           ro.build.date
+same_as  ro.vendor_dlkm.build.date      ro.build.date
