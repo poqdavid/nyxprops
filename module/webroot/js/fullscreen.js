@@ -18,8 +18,19 @@
 // deliberate: if KernelSU computes them once at load instead of updating
 // them when the bars hide, an ungated rule would leave a phantom gap at
 // the top the moment fullscreen was turned back on.
+//
+// KernelSU, SukiSU-Ultra and ReSukiSU also tie edge-to-edge to fullScreen:
+// fullScreen(false) turns it off, and the manager goes back to padding the
+// WebView for the bars. The inset values it already pushed into the page
+// stay, though, so app.css would pad for the bars a second time - a double
+// gap above the top bar and below the nav bar, which only cleared after
+// toggling fullscreen on and off (the values get pushed as 0 while the
+// bars are hidden). Turning edge-to-edge straight back on keeps the module
+// owning its insets on every host. KernelSU-Next's fullScreen leaves
+// edge-to-edge alone and it has no enableEdgeToEdge, so nothing changes
+// there.
 
-import { fullScreen, fullScreenAvailable } from './ksu-bridge.js';
+import { fullScreen, fullScreenAvailable, enableEdgeToEdge } from './ksu-bridge.js';
 
 /**
  * @param {boolean} enabled
@@ -28,7 +39,7 @@ import { fullScreen, fullScreenAvailable } from './ksu-bridge.js';
  */
 export function applyFullscreen(enabled) {
 	const on = Boolean(enabled) && fullScreenAvailable();
-	fullScreen(on);
+	if (fullScreen(on) && !on) enableEdgeToEdge();
 	document.documentElement.dataset.fullscreen = on ? 'on' : 'off';
 	return on;
 }

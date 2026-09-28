@@ -63,7 +63,7 @@ if command -v curl > /dev/null 2>&1; then
     download() { curl --connect-timeout 10 -Ls "$1"; }
 fi
 
-chmod 644 ${MODPATH}/service.sh ${MODPATH}/boot-completed.sh ${MODPATH}/uninstall.sh
+chmod 644 ${MODPATH}/post-fs-data.sh ${MODPATH}/service.sh ${MODPATH}/boot-completed.sh ${MODPATH}/uninstall.sh ${MODPATH}/bin-update.sh
 
 nyx_had_existing_dir=0
 [ -d ${PERSISTENT_DIR} ] && nyx_had_existing_dir=1

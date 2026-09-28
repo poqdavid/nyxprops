@@ -18,6 +18,14 @@
 # opt-in: switch to auto or rs to use it.
 prop_tool='magisk'
 
+# 1 = don't check resetprop-rs when the WebUI opens (the default).
+# Set to 0 to have the WebUI compare the installed resetprop-rs binary
+# against the latest Enginex0/resetprop-rs release on open and offer to
+# install it. The check only ever reports; nothing is replaced without
+# confirmation. There is also a "Check" button in Settings that works
+# either way. Not read by any boot-stage script.
+disable_webui_bin_update=1
+
 # Prop preset repeat (re-application timer). A preset can carry a
 # '# repeat: N' header (N seconds) to have it re-applied periodically -
 # for the rare prop that something resets AFTER boot. Off for every

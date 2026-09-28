@@ -1,6 +1,8 @@
 # name: Build type
 # description: Reports a user build signed with release-keys instead of userdebug/test-keys.
 # enabled: 1
+# stage: post-fs-data
+# (runs before zygote so the framework's Build.* value matches this property)
 
 reset  ro.build.type  user
 reset  ro.build.tags  release-keys

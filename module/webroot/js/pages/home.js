@@ -1,7 +1,56 @@
 import { icons } from '../icons.js';
-import { getBootState, getCategoryEntries, listPropPresets, getDeviceInfo, getVerification } from '../props-data.js';
+import { getHomeData } from '../props-data.js';
 import { openSheetLoading, openSheetWithList } from '../sheet.js';
+import { nextPaint } from '../ksu-bridge.js';
 import { t } from '../i18n.js';
+
+// What the stat cards list, from the same read the card numbers came from -
+// so tapping a card opens instantly, and its list is by construction the
+// rows that were counted.
+let lastData = null;
+
+// A preset changed on the Props page: the app re-reads Home on its next
+// visit, but a card tapped before that read lands must not list the old
+// presets, so it reads for itself until then.
+document.addEventListener('nyx:presets-changed', () => {
+	lastData = null;
+});
+
+/**
+ * Show (or clear, with null) a notice above the stats. Lives outside
+ * refreshHome so an async check finishing while the user is on another page
+ * doesn't get wiped by refreshHome rewriting the cards.
+ */
+export function setHomeNotice(notice) {
+	const host = document.querySelector('#page-home [data-role="notice"]');
+	if (!host) return;
+	host.innerHTML = '';
+	if (!notice) return;
+
+	const card = document.createElement('div');
+	card.className = `notice-card${notice.kind === 'warn' ? ' is-warn' : ''}`;
+	const text = document.createElement('div');
+	text.className = 'notice-card__text';
+	const title = document.createElement('div');
+	title.className = 'notice-card__title';
+	title.textContent = notice.title;
+	text.appendChild(title);
+	if (notice.subtitle) {
+		const sub = document.createElement('div');
+		sub.className = 'notice-card__subtitle';
+		sub.textContent = notice.subtitle;
+		text.appendChild(sub);
+	}
+	card.appendChild(text);
+	if (notice.actionLabel && notice.onAction) {
+		const btn = document.createElement('button');
+		btn.className = 'btn btn--tonal notice-card__action';
+		btn.textContent = notice.actionLabel;
+		btn.addEventListener('click', () => notice.onAction(btn));
+		card.appendChild(btn);
+	}
+	host.appendChild(card);
+}
 
 // Verification rows: how each key from getVerification() is labelled and how
 // its value is rendered. `fmt` turns the raw value into display text.
@@ -47,6 +96,7 @@ function infoRowHtml(label, value) {
 export function renderHomeShell(root) {
 	root.innerHTML = `
 		<div data-role="status"></div>
+		<div data-role="notice"></div>
 		<h2 class="section-title">${t('home_verify_title', 'Verification')}</h2>
 		<div class="card" data-role="verify"></div>
 		<h2 class="section-title">${t('home_stats_title', 'This boot')}</h2>
@@ -57,27 +107,36 @@ export function renderHomeShell(root) {
 	root.querySelector('[data-role="stats"]').addEventListener('click', async (e) => {
 		const btn = e.target.closest('.stat-card');
 		if (!btn) return;
-		if (btn.dataset.category === 'applied') {
-			const title = t('home_stat_applied', 'props applied');
+		const category = btn.dataset.category;
+		const title = category === 'applied'
+			? t('home_stat_applied', 'props applied')
+			: t('home_stat_presets', 'presets enabled');
+		let data = lastData;
+		if (!data) {
 			openSheetLoading(title);
-			const [boot, entries] = await Promise.all([getBootState(), getCategoryEntries('prop')]);
-			openSheetWithList(title, boot.current ? entries : [], boot.current
+			await nextPaint();
+			data = await getHomeData();
+		}
+		if (category === 'applied') {
+			const { boot, applied } = data;
+			openSheetWithList(title, boot.current ? applied : [], boot.current
 				? t('home_stat_applied_empty', 'No props were applied this boot. Either every preset is disabled, or none of their rules matched this device.')
 				: t('home_stat_applied_none', "The presets haven't run this boot."));
-		} else if (btn.dataset.category === 'presets') {
-			const title = t('home_stat_presets', 'presets enabled');
-			openSheetLoading(title);
-			const presets = await listPropPresets();
-			openSheetWithList(title, presets.filter((p) => p.enabled).map((p) => `${p.name} (${p.file})`),
+		} else if (category === 'presets') {
+			openSheetWithList(title, data.presets.filter((p) => p.enabled).map((p) => `${p.name} (${p.file})`),
 				t('home_stat_presets_empty', 'No presets are enabled.'));
 		}
 	});
 }
 
 export async function refreshHome(root) {
-	const [boot, logged, presets, verify, device] = await Promise.all([
-		getBootState(), getCategoryEntries('prop'), listPropPresets(), getVerification(), getDeviceInfo(),
-	]);
+	renderHome(root, await getHomeData());
+}
+
+/** Fill the page from a getHomeData() result (also used at startup). */
+export function renderHome(root, data) {
+	lastData = data;
+	const { boot, applied: logged, presets, verify, device } = data;
 	const enabled = presets.filter((p) => p.enabled).length;
 	// Only count what this boot applied; a log from an earlier boot is stale.
 	const applied = boot.current ? logged : [];

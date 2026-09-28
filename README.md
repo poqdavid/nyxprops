@@ -10,9 +10,10 @@ Config-driven **device property spoofing** for **KernelSU / KernelSU-Next**, wit
 
 - 🧩 **21 shipped presets** (16 on by default): verified boot state and errors, AVB / vbmeta, warranty bit, debuggable / secure, mock location, build type, OEM unlock, recovery bootmode, ADB state, USB config, vendor-specific props (Xiaomi / Realme), emulator traces, encryption state and the crash-recovery counter, plus opt-in presets for security patch, build date, verified boot hash, build fingerprint and custom ROM props
 - 📝 **Plain-text rules**: `missing`, `reset`, `missing_match`, `contains`, `clear`, `delete`, `replace`, `delete_matching` and `same_as`, with `{avb_version}`, `{vbmeta_size}`, `{security_patch}` and `{yyyy_mm}` value tokens
-- ⏱️ **Stages and gates**: each preset runs at the service stage (default) or at boot-completed, and can be limited to an Android API range with `min_sdk` / `max_sdk`
+- ⏱️ **Stages and gates**: each preset runs at `post-fs-data` (before zygote — for build-identity props the framework caches, like the security patch level, fingerprint and build type), the `service` stage (default), or `boot-completed`, and can be limited to an Android API range with `min_sdk` / `max_sdk`
 - 🔁 **Optional repeat**: a preset with a `# repeat: N` header is re-applied every N seconds, for the rare prop something resets after boot (off for every shipped preset)
 - 🥷 **Two backends**: the stock KernelSU/Magisk `resetprop` (default) or the bundled **resetprop-rs** for stealth writes and count-preserving deletes
+- ⬆️ **resetprop-rs updates**: compare the installed binary with the latest resetprop-rs release from the WebUI and install it in place, on demand or with an opt-in check when the WebUI opens
 - 🧹 **Prop-area rebuild**: after deletions, reclaims the storage holes they leave behind (touched areas, all areas, or off)
 - 🎨 **Material You WebUI**: boot status, verification checks, a live list of the props applied this boot, and an in-app preset editor
 - 📂 **Own config directory**: presets and settings live under `/data/adb/nyxprops`; your edits survive updates
@@ -41,9 +42,10 @@ SuSFS is not required. For path and mount hiding, pair it with **[NyxSUSFS](http
 
 ## 🖥️ WebUI
 
-- **Home**: whether presets were applied this boot and with which backend, verification checks (verified boot state, bootloader, dm-verity, security patch), counters for props applied and presets enabled, and device info
+- **Home**: whether presets were applied this boot and with which backend, verification checks (verified boot state, bootloader, dm-verity, security patch), counters for props applied and presets enabled, and device info. With the update check on, it also shows a notice when a different resetprop-rs build is published
 - **Props**: turn presets on or off, edit their rules, create new ones or delete them
-- **Settings**: prop backend, prop-area rebuild and the repeat loop master switch
+- **Settings**: prop backend, prop-area rebuild, the repeat loop master switch, and resetprop-rs updates (check now, or check each time the WebUI opens)
+- **Logs**: this boot's log (`props.log`): the backend used, each preset run or skipped, and every prop changed, newest at the bottom
 - **About**: appearance (theme, Material You, fullscreen) and credits
 
 Changes to presets and settings take effect on the next reboot.
@@ -78,13 +80,16 @@ Changing system properties can confuse apps or the system itself. Please make su
 
 ## 🌟 Special Thanks
 
-| 🔧 **Project**    | 👨‍💻 **Developer** | 🔗 **Link**                                              |
-| ---------------- | ----------------- | -------------------------------------------------------- |
-| **KernelSU**     | tiann             | [GitHub](https://github.com/tiann/KernelSU)              |
-| **KernelSU-Next**| rifsxd            | [GitHub](https://github.com/KernelSU-Next/KernelSU-Next) |
-| **Magisk**       | topjohnwu         | [GitHub](https://github.com/topjohnwu/Magisk)            |
-| **resetprop-rs** | Enginex0          | [GitHub](https://github.com/Enginex0/resetprop-rs)       |
-| **BRENE**        | rrr333nnn333      | [GitHub](https://github.com/rrr333nnn333/BRENE)          |
+| 🔧 **Project**        | 👨‍💻 **Developer** | 🔗 **Link**                                              |
+| -------------------- | ----------------- | -------------------------------------------------------- |
+| **KernelSU**         | tiann             | [GitHub](https://github.com/tiann/KernelSU)              |
+| **KernelSU-Next**    | rifsxd            | [GitHub](https://github.com/KernelSU-Next/KernelSU-Next) |
+| **Magisk**           | topjohnwu         | [GitHub](https://github.com/topjohnwu/Magisk)            |
+| **resetprop-rs**     | Enginex0          | [GitHub](https://github.com/Enginex0/resetprop-rs)       |
+| **BRENE**            | rrr333nnn333      | [GitHub](https://github.com/rrr333nnn333/BRENE)          |
+| **ksu_module_susfs** | sidex15           | [GitHub](https://github.com/sidex15/ksu_module_susfs)    |
+
+*The set of props the presets cover follows BRENE's. See [NOTICE.md](NOTICE.md) for what comes from where.*
 
 *If you have contributed and are not listed here, please remind me!* 🙏
 
@@ -92,7 +97,7 @@ Changing system properties can confuse apps or the system itself. Please make su
 
 ## 📄 License
 
-NyxProps is released under the [GNU General Public License v3.0](LICENSE). The bundled resetprop-rs binaries are MIT-licensed; see `module/LICENSE.resetprop-rs`.
+NyxProps is released under the [GNU Affero General Public License v3.0](LICENSE) (`AGPL-3.0-only`). Bundled third-party files keep their own licenses (resetprop-rs: MIT; two WebUI icons: Apache-2.0); see [NOTICE.md](NOTICE.md).
 
 ---
 

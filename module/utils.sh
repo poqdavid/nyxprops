@@ -160,7 +160,12 @@ nyx_rebuild_touched_areas() {
             nyx_tag_log prop_rebuild_warn "no surviving prop in $_ctx to scope a rebuild"
             continue
         fi
-        _out=$(resetprop -Z "$_rep" -c 2>&1)
+        # Flags BEFORE the name: resetprop stops reading options at the
+        # first non-option arg, so `resetprop -Z "$_rep" -c` would treat
+        # -c as a value and SET "$_rep" to the literal "-c" (one wrecked
+        # prop per touched area). `-c -Z NAME` rebuilds the area holding
+        # NAME, as documented.
+        _out=$(resetprop -c -Z "$_rep" 2>&1)
         case "$_out" in
             *"failed to rebuild"* | *"corrupted"*)
                 nyx_tag_log prop_rebuild_warn "$_ctx: $(echo "$_out" | grep -iE 'failed to rebuild|corrupted' | head -n 1)"
@@ -475,6 +480,29 @@ nyx_preset_repeat_interval() {
 
 nyx_current_boot_id() {
     cat /proc/sys/kernel/random/boot_id 2> /dev/null
+}
+
+# Reset the per-boot log and record the boot id + backend, but only once a
+# boot: whichever stage runs first (post-fs-data) does it, and the later
+# stages (service, boot-completed) append to the same log. Idempotent - if
+# the log already carries this boot's id, it is left as is. Needs logfile1
+# set and nyx_prop_tool_init already run (for NYX_RP_MODE).
+nyx_init_boot_log() {
+    [ -n "$logfile1" ] || return 0
+    mkdir -p "$(dirname "$logfile1")" 2> /dev/null
+    _nib_cur=$(nyx_current_boot_id)
+    _nib_need=0
+    if [ ! -f "$logfile1" ]; then
+        _nib_need=1
+    elif [ -n "$_nib_cur" ]; then
+        _nib_last=$(grep -E '^\[boot_id\]:' "$logfile1" 2> /dev/null | tail -n 1 | sed 's/^\[boot_id\]:[[:space:]]*nyxprops[[:space:]]*//')
+        [ "$_nib_last" = "$_nib_cur" ] || _nib_need=1
+    fi
+    if [ "$_nib_need" = 1 ]; then
+        echo "nyxprops/boot: [logging_initialized]" > "$logfile1"
+        nyx_tag_log boot_id "$_nib_cur"
+        nyx_tag_log prop_tool "$NYX_RP_MODE"
+    fi
 }
 
 nyx_preset_sdk_ok() {

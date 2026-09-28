@@ -1,6 +1,8 @@
 # name: Debuggable / secure
 # description: Presents the build as a non-debuggable, secure production build.
 # enabled: 1
+# stage: post-fs-data
+# (runs before zygote so the framework's Build.* value matches this property)
 
 reset  ro.debuggable        0
 reset  ro.force.debuggable  0

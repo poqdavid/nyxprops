@@ -1,6 +1,8 @@
 # name: Build fingerprint
 # description: Rewrites userdebug to user in ro.build.fingerprint and strips custom-ROM names from it. OFF by default - read the warning below before enabling.
 # enabled: 0
+# stage: post-fs-data
+# (runs before zygote so the framework's Build.* value matches this property)
 
 # WARNING, and the reason this ships disabled:
 #   Stripping a ROM name out of a fingerprint leaves the rest behind,
