@@ -1,0 +1,334 @@
+{
+ "scenario": "global-rebuild",
+ "stages": [
+  {
+   "stage": "post-fs-data",
+   "exit": 0,
+   "output": "",
+   "calls": [
+    "resetprop [ro.boot.avb_version]",
+    "date [+%Y-%m-%d]",
+    "resetprop [ro.build.version.sdk]",
+    "resetprop [ro.debuggable]",
+    "resetprop [-n] [ro.debuggable] [0]",
+    "resetprop [-Z] [ro.debuggable]",
+    "resetprop [ro.force.debuggable]",
+    "resetprop [ro.secure]",
+    "resetprop [-n] [ro.secure] [1]",
+    "resetprop [-Z] [ro.secure]",
+    "resetprop [ro.adb.secure]",
+    "resetprop [-n] [ro.adb.secure] [1]",
+    "resetprop [-Z] [ro.adb.secure]",
+    "resetprop [ro.build.type]",
+    "resetprop [-n] [ro.build.type] [user]",
+    "resetprop [-Z] [ro.build.type]",
+    "resetprop [ro.build.tags]",
+    "resetprop [-n] [ro.build.tags] [release-keys]",
+    "resetprop [-Z] [ro.build.tags]",
+    "resetprop [ro.build.keys]",
+    "resetprop [-c] [--force]"
+   ],
+   "props": {
+    "ro.adb.secure": [
+     "0",
+     "1"
+    ],
+    "ro.build.tags": [
+     "test-keys",
+     "release-keys"
+    ],
+    "ro.build.type": [
+     "userdebug",
+     "user"
+    ],
+    "ro.debuggable": [
+     "1",
+     "0"
+    ],
+    "ro.secure": [
+     "0",
+     "1"
+    ]
+   },
+   "changed": {
+    "/data/adb/ksu/nyxprops/logs": [
+     "0o755",
+     "0:0",
+     null
+    ],
+    "/data/adb/ksu/nyxprops/logs/props.log": [
+     "0o644",
+     "0:0",
+     "nyxprops/boot: [logging_initialized]\n[boot_id]: nyxprops <boot_id>\n[prop_tool]: nyxprops magisk\n[prop_preset]: nyxprops 40-debuggable.prop\n[prop]: nyxprops ro.debuggable=0\n[prop]: nyxprops ro.secure=1\n[prop]: nyxprops ro.adb.secure=1\n[prop_preset]: nyxprops 50-build-type.prop\n[prop]: nyxprops ro.build.type=user\n[prop]: nyxprops ro.build.tags=release-keys\n[prop_preset_skipped]: nyxprops 52-security-patch.prop\n[prop_preset_skipped]: nyxprops 97-fingerprint.prop\n[prop_rebuild]: nyxprops global\n"
+    ]
+   },
+   "removed": []
+  },
+  {
+   "stage": "service",
+   "exit": 0,
+   "output": "",
+   "calls": [
+    "resetprop [-w] [sys.boot_completed] [0]",
+    "resetprop [ro.boot.avb_version]",
+    "date [+%Y-%m-%d]",
+    "resetprop [ro.build.version.sdk]",
+    "resetprop [ro.boot.vbmeta.invalidate_on_error]",
+    "resetprop [-n] [ro.boot.vbmeta.invalidate_on_error] [yes]",
+    "resetprop [-Z] [ro.boot.vbmeta.invalidate_on_error]",
+    "resetprop [ro.boot.vbmeta.avb_version]",
+    "resetprop [-n] [ro.boot.vbmeta.avb_version] [1.3]",
+    "resetprop [-Z] [ro.boot.vbmeta.avb_version]",
+    "resetprop [ro.boot.vbmeta.hash_alg]",
+    "resetprop [-n] [ro.boot.vbmeta.hash_alg] [sha256]",
+    "resetprop [-Z] [ro.boot.vbmeta.hash_alg]",
+    "resetprop [ro.boot.vbmeta.size]",
+    "resetprop [-n] [ro.boot.vbmeta.size] [13696]",
+    "resetprop [-Z] [ro.boot.vbmeta.size]",
+    "resetprop [ro.boot.vbmeta.device_state]",
+    "resetprop [-n] [ro.boot.vbmeta.device_state] [locked]",
+    "resetprop [-Z] [ro.boot.vbmeta.device_state]",
+    "resetprop [vendor.boot.vbmeta.device_state]",
+    "resetprop [-n] [vendor.boot.vbmeta.device_state] [locked]",
+    "resetprop [-Z] [vendor.boot.vbmeta.device_state]",
+    "resetprop [ro.boot.avb_version]",
+    "resetprop [ro.boot.verifiedbootstate]",
+    "resetprop [-n] [ro.boot.verifiedbootstate] [green]",
+    "resetprop [-Z] [ro.boot.verifiedbootstate]",
+    "resetprop [ro.boot.flash.locked]",
+    "resetprop [-n] [ro.boot.flash.locked] [1]",
+    "resetprop [-Z] [ro.boot.flash.locked]",
+    "resetprop [ro.boot.veritymode]",
+    "resetprop [-n] [ro.boot.veritymode] [enforcing]",
+    "resetprop [-Z] [ro.boot.veritymode]",
+    "resetprop [vendor.boot.verifiedbootstate]",
+    "resetprop [-n] [vendor.boot.verifiedbootstate] [green]",
+    "resetprop [-Z] [vendor.boot.verifiedbootstate]",
+    "resetprop [ro.is_ever_orange]",
+    "resetprop [-n] [ro.is_ever_orange] [0]",
+    "resetprop [-Z] [ro.is_ever_orange]",
+    "resetprop",
+    "resetprop [-Z] [ro.boot.verifiedbooterror]",
+    "resetprop [-d] [ro.boot.verifiedbooterror]",
+    "resetprop",
+    "resetprop",
+    "resetprop [-Z] [vendor.boot.verifyerrorpart]",
+    "resetprop [-d] [vendor.boot.verifyerrorpart]",
+    "resetprop",
+    "resetprop [ro.boot.warranty_bit]",
+    "resetprop [-n] [ro.boot.warranty_bit] [0]",
+    "resetprop [-Z] [ro.boot.warranty_bit]",
+    "resetprop [ro.warranty_bit]",
+    "resetprop [-n] [ro.warranty_bit] [0]",
+    "resetprop [-Z] [ro.warranty_bit]",
+    "resetprop [ro.vendor.boot.warranty_bit]",
+    "resetprop [ro.vendor.warranty_bit]",
+    "resetprop [-n] [ro.vendor.warranty_bit] [0]",
+    "resetprop [-Z] [ro.vendor.warranty_bit]",
+    "resetprop [ro.allow.mock.location]",
+    "resetprop [-n] [ro.allow.mock.location] [0]",
+    "resetprop [-Z] [ro.allow.mock.location]",
+    "resetprop [sys.oem_unlock_allowed]",
+    "resetprop [-n] [sys.oem_unlock_allowed] [0]",
+    "resetprop [-Z] [sys.oem_unlock_allowed]",
+    "resetprop [ro.secureboot.lockstate]",
+    "resetprop [-n] [ro.secureboot.lockstate] [locked]",
+    "resetprop [-Z] [ro.secureboot.lockstate]",
+    "resetprop [ro.boot.realmebootstate]",
+    "resetprop [-n] [ro.boot.realmebootstate] [green]",
+    "resetprop [-Z] [ro.boot.realmebootstate]",
+    "resetprop [ro.boot.realme.lockstate]",
+    "resetprop [ro.bootmode]",
+    "resetprop [-n] [ro.bootmode] [unknown]",
+    "resetprop [-Z] [ro.bootmode]",
+    "resetprop [ro.boot.bootmode]",
+    "resetprop [vendor.boot.bootmode]",
+    "resetprop [-n] [vendor.boot.bootmode] [unknown]",
+    "resetprop [-Z] [vendor.boot.bootmode]",
+    "resetprop [persist.sys.usb.config]",
+    "resetprop [-n] [persist.sys.usb.config] [mtp]",
+    "resetprop [-Z] [persist.sys.usb.config]",
+    "resetprop [ro.kernel.qemu]",
+    "resetprop [-n] [ro.kernel.qemu] []",
+    "resetprop [-Z] [ro.kernel.qemu]",
+    "resetprop [ro.crypto.state]",
+    "resetprop [-n] [ro.crypto.state] [encrypted]",
+    "resetprop [-Z] [ro.crypto.state]",
+    "resetprop",
+    "resetprop [-Z] [crashrecovery.rescue_boot_count]",
+    "resetprop [-d] [crashrecovery.rescue_boot_count]",
+    "resetprop [-c] [--force]"
+   ],
+   "props": {
+    "crashrecovery.rescue_boot_count": [
+     "2",
+     null
+    ],
+    "persist.sys.usb.config": [
+     "mtp,adb",
+     "mtp"
+    ],
+    "ro.allow.mock.location": [
+     "1",
+     "0"
+    ],
+    "ro.boot.flash.locked": [
+     "0",
+     "1"
+    ],
+    "ro.boot.realmebootstate": [
+     "orange",
+     "green"
+    ],
+    "ro.boot.vbmeta.avb_version": [
+     null,
+     "1.3"
+    ],
+    "ro.boot.vbmeta.device_state": [
+     "unlocked",
+     "locked"
+    ],
+    "ro.boot.vbmeta.hash_alg": [
+     null,
+     "sha256"
+    ],
+    "ro.boot.vbmeta.invalidate_on_error": [
+     null,
+     "yes"
+    ],
+    "ro.boot.vbmeta.size": [
+     null,
+     "13696"
+    ],
+    "ro.boot.verifiedbooterror": [
+     "vbmeta_unlocked",
+     null
+    ],
+    "ro.boot.verifiedbootstate": [
+     "orange",
+     "green"
+    ],
+    "ro.boot.veritymode": [
+     "eio",
+     "enforcing"
+    ],
+    "ro.boot.warranty_bit": [
+     "1",
+     "0"
+    ],
+    "ro.bootmode": [
+     "recovery",
+     "unknown"
+    ],
+    "ro.crypto.state": [
+     "unencrypted",
+     "encrypted"
+    ],
+    "ro.is_ever_orange": [
+     "1",
+     "0"
+    ],
+    "ro.kernel.qemu": [
+     "1",
+     ""
+    ],
+    "ro.secureboot.lockstate": [
+     "unlocked",
+     "locked"
+    ],
+    "ro.vendor.warranty_bit": [
+     "1",
+     "0"
+    ],
+    "ro.warranty_bit": [
+     "1",
+     "0"
+    ],
+    "sys.oem_unlock_allowed": [
+     "1",
+     "0"
+    ],
+    "vendor.boot.bootmode": [
+     "recovery_mode",
+     "unknown"
+    ],
+    "vendor.boot.vbmeta.device_state": [
+     "unlocked",
+     "locked"
+    ],
+    "vendor.boot.verifiedbootstate": [
+     "orange",
+     "green"
+    ],
+    "vendor.boot.verifyerrorpart": [
+     "boot",
+     null
+    ]
+   },
+   "changed": {
+    "/data/adb/ksu/nyxprops/logs/props.log": [
+     "0o644",
+     "0:0",
+     "(appended)\n[prop_preset]: nyxprops 10-vbmeta.prop\n[prop]: nyxprops ro.boot.vbmeta.invalidate_on_error=yes\n[prop]: nyxprops ro.boot.vbmeta.avb_version=1.3\n[prop]: nyxprops ro.boot.vbmeta.hash_alg=sha256\n[prop]: nyxprops ro.boot.vbmeta.size=13696\n[prop]: nyxprops ro.boot.vbmeta.device_state=locked\n[prop]: nyxprops vendor.boot.vbmeta.device_state=locked\n[prop_preset]: nyxprops 20-verified-boot.prop\n[prop]: nyxprops ro.boot.verifiedbootstate=green\n[prop]: nyxprops ro.boot.flash.locked=1\n[prop]: nyxprops ro.boot.veritymode=enforcing\n[prop]: nyxprops vendor.boot.verifiedbootstate=green\n[prop]: nyxprops ro.is_ever_orange=0\n[prop_preset]: nyxprops 25-verified-boot-errors.prop\n[prop]: nyxprops ro.boot.verifiedbooterror=(deleted)\n[prop]: nyxprops vendor.boot.verifyerrorpart=(deleted)\n[prop_preset]: nyxprops 30-warranty.prop\n[prop]: nyxprops ro.boot.warranty_bit=0\n[prop]: nyxprops ro.warranty_bit=0\n[prop]: nyxprops ro.vendor.warranty_bit=0\n[prop_preset]: nyxprops 44-mock-location.prop\n[prop]: nyxprops ro.allow.mock.location=0\n[prop_preset_skipped]: nyxprops 53-build-date.prop\n[prop_preset_skipped]: nyxprops 54-verified-boot-hash.prop\n[prop_preset]: nyxprops 60-oem-unlock.prop\n[prop]: nyxprops sys.oem_unlock_allowed=0\n[prop_preset_skipped]: nyxprops 61-oem-unlock-sdk36.prop (sdk 34 < min_sdk 36)\n[prop_preset]: nyxprops 70-oem-vendor.prop\n[prop]: nyxprops ro.secureboot.lockstate=locked\n[prop]: nyxprops ro.boot.realmebootstate=green\n[prop_preset]: nyxprops 80-recovery-bootmode.prop\n[prop]: nyxprops ro.bootmode=unknown\n[prop]: nyxprops vendor.boot.bootmode=unknown\n[prop_preset]: nyxprops 86-usb-config.prop\n[prop]: nyxprops persist.sys.usb.config=mtp\n[prop_preset]: nyxprops 90-emulator.prop\n[prop]: nyxprops ro.kernel.qemu=(cleared)\n[prop_preset]: nyxprops 95-encryption.prop\n[prop]: nyxprops ro.crypto.state=encrypted\n[prop_preset]: nyxprops 96-crashrecovery.prop\n[prop]: nyxprops crashrecovery.rescue_boot_count=(deleted)\n[prop_preset_skipped]: nyxprops 98-rom-props.prop\n[prop_rebuild]: nyxprops global\n"
+    ]
+   },
+   "removed": []
+  },
+  {
+   "stage": "boot-completed",
+   "exit": 0,
+   "output": "",
+   "calls": [
+    "resetprop [ro.boot.avb_version]",
+    "date [+%Y-%m-%d]",
+    "resetprop [ro.build.version.sdk]",
+    "resetprop [init.svc.adbd]",
+    "resetprop [-n] [init.svc.adbd] [stopped]",
+    "resetprop [-Z] [init.svc.adbd]",
+    "resetprop [init.svc_debug_pid.adbd]",
+    "resetprop [-n] [init.svc_debug_pid.adbd] []",
+    "resetprop [-Z] [init.svc_debug_pid.adbd]",
+    "resetprop",
+    "resetprop [-Z] [service.adb.root]",
+    "resetprop [-d] [service.adb.root]",
+    "resetprop",
+    "resetprop [-Z] [service.adb.tcp.port]",
+    "resetprop [-d] [service.adb.tcp.port]",
+    "resetprop [-c] [--force]",
+    "resetprop [ro.build.version.sdk]"
+   ],
+   "props": {
+    "init.svc.adbd": [
+     "running",
+     "stopped"
+    ],
+    "init.svc_debug_pid.adbd": [
+     "1234",
+     ""
+    ],
+    "service.adb.root": [
+     "1",
+     null
+    ],
+    "service.adb.tcp.port": [
+     "5555",
+     null
+    ]
+   },
+   "changed": {
+    "/data/adb/ksu/nyxprops/logs/props.log": [
+     "0o644",
+     "0:0",
+     "(appended)\n[prop_preset]: nyxprops 85-adb-state.prop\n[prop]: nyxprops init.svc.adbd=stopped\n[prop]: nyxprops init.svc_debug_pid.adbd=(cleared)\n[prop]: nyxprops service.adb.root=(deleted)\n[prop]: nyxprops service.adb.tcp.port=(deleted)\n[prop_rebuild]: nyxprops global\n"
+    ],
+    "/data/adb/modules/nyxprops/module.prop": [
+     "0o644",
+     "0:0",
+     "id=nyxprops\nname=NyxProps\nversion=<module.prop>\nversionCode=<module.prop>\nauthor=poqdavid\ndescription=[✅ Active] 16/21 presets enabled · stock resetprop — details in the WebUI\nupdateJson=https://raw.githubusercontent.com/poqdavid/nyxprops/main/update.json\n"
+    ]
+   },
+   "removed": []
+  }
+ ],
+ "repeat": null
+}

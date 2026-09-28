@@ -1,0 +1,71 @@
+{
+ "scenario": "no-props-dir",
+ "stages": [
+  {
+   "stage": "post-fs-data",
+   "exit": 0,
+   "output": "",
+   "calls": [
+    "resetprop [ro.boot.avb_version]",
+    "date [+%Y-%m-%d]"
+   ],
+   "props": {},
+   "changed": {
+    "/data/adb/ksu/nyxprops/logs": [
+     "0o755",
+     "0:0",
+     null
+    ],
+    "/data/adb/ksu/nyxprops/logs/props.log": [
+     "0o644",
+     "0:0",
+     "nyxprops/boot: [logging_initialized]\n[boot_id]: nyxprops <boot_id>\n[prop_tool]: nyxprops magisk\n[prop_error]: nyxprops props directory '/data/adb/nyxprops/props' not found, no props applied\n"
+    ]
+   },
+   "removed": []
+  },
+  {
+   "stage": "service",
+   "exit": 0,
+   "output": "",
+   "calls": [
+    "resetprop [-w] [sys.boot_completed] [0]",
+    "resetprop [ro.boot.avb_version]",
+    "date [+%Y-%m-%d]"
+   ],
+   "props": {},
+   "changed": {
+    "/data/adb/ksu/nyxprops/logs/props.log": [
+     "0o644",
+     "0:0",
+     "(appended)\n[prop_error]: nyxprops props directory '/data/adb/nyxprops/props' not found, no props applied\n"
+    ]
+   },
+   "removed": []
+  },
+  {
+   "stage": "boot-completed",
+   "exit": 0,
+   "output": "",
+   "calls": [
+    "resetprop [ro.boot.avb_version]",
+    "date [+%Y-%m-%d]"
+   ],
+   "props": {},
+   "changed": {
+    "/data/adb/ksu/nyxprops/logs/props.log": [
+     "0o644",
+     "0:0",
+     "(appended)\n[prop_error]: nyxprops props directory '/data/adb/nyxprops/props' not found, no props applied\n"
+    ],
+    "/data/adb/modules/nyxprops/module.prop": [
+     "0o644",
+     "0:0",
+     "id=nyxprops\nname=NyxProps\nversion=<module.prop>\nversionCode=<module.prop>\nauthor=poqdavid\ndescription=[❌ No presets found] 0/0 presets enabled · stock resetprop — details in the WebUI\nupdateJson=https://raw.githubusercontent.com/poqdavid/nyxprops/main/update.json\n"
+    ]
+   },
+   "removed": []
+  }
+ ],
+ "repeat": null
+}

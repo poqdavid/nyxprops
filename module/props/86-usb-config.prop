@@ -1,0 +1,15 @@
+# name: USB config
+# description: Reports the USB mode as MTP rather than ADB. Kept separate from the ADB state preset so either can be turned off alone.
+# enabled: 1
+# Optional: add a header line reading  repeat: 120  (no leading text) to
+# re-apply this every 120s if something resets it after boot. Off unless
+# added. Starts a background process; see config.sh repeat_enabled /
+# repeat_min_interval.
+
+# Reported only, not actually changed. On the stock resetprop this is
+# written with -n (skip property_service), so init never sees a
+# sys.usb.config change and does NOT reconfigure the USB gadget - the
+# prop reads as mtp but ADB is not dropped. resetprop-rs writes it
+# stealthily. Either way the real USB mode is untouched; only what the
+# prop reports changes.
+reset  persist.sys.usb.config  mtp

@@ -1,0 +1,26 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/KernelSU-Modules/tools/main/schemas/module.schema.json
+# KernelSU Modules metadata: https://developers.kernelsu.org/docs/module-yaml
+# version and versionCode come from module/module.prop inside the release zip.
+schemaVersion: 1
+id: nyxprops
+name: NyxProps
+summary: >-
+    Config-driven device property spoofing presets for KernelSU and
+    KernelSU-Next, with a Material You WebUI. The prop-spoofing companion to
+    NyxSUSFS; it does not need SuSFS.
+description: README.md
+license: AGPL-3.0-only
+homepage: https://github.com/poqdavid/nyxprops
+support: https://github.com/poqdavid/nyxprops/issues
+tags: [props, resetprop, root-hiding, webui]
+metamodule: false
+
+authors:
+    - name: poqdavid
+      url: https://github.com/poqdavid
+
+compatibility:
+    architectures: [arm64-v8a, armeabi-v7a, x86_64, x86]
+
+release:
+    assetPattern: 'nyxprops-*.zip'

@@ -1,0 +1,24 @@
+# Build artifacts
+*.sha256
+*.zip
+build/
+out/
+node_modules/
+module/LICENSE
+module/NOTICE.md
+
+# Rust
+/target/
+Cargo.lock.orig
+# The nyxprops engine binaries are built by CI and selected at install time.
+module/bin/nyxprops
+module/bin/nyxprops-*
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+# The WebUI script is bundled from webui/src at build time (npm run build)
+module/webroot/js/
+
+# Python bytecode from the CI scripts and tests
+__pycache__/
