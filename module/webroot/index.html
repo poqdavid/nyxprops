@@ -7,6 +7,25 @@
 <title>NyxProps</title>
 <link rel="stylesheet" href="css/tokens.css">
 <link rel="stylesheet" href="css/app.css">
+<!-- Every module is requested up front instead of in waves as imports are
+     discovered: the manager serves each file separately (ReSukiSU through a
+     new root shell per file), so the waves add up. Keep in sync with js/. -->
+<link rel="modulepreload" href="js/app.js">
+<link rel="modulepreload" href="js/ksu-bridge.js">
+<link rel="modulepreload" href="js/props-data.js">
+<link rel="modulepreload" href="js/i18n.js">
+<link rel="modulepreload" href="js/theme.js">
+<link rel="modulepreload" href="js/fullscreen.js">
+<link rel="modulepreload" href="js/keyboard.js">
+<link rel="modulepreload" href="js/bin-update.js">
+<link rel="modulepreload" href="js/icons.js">
+<link rel="modulepreload" href="js/sheet.js">
+<link rel="modulepreload" href="js/dialog.js">
+<link rel="modulepreload" href="js/pages/home.js">
+<link rel="modulepreload" href="js/pages/props.js">
+<link rel="modulepreload" href="js/pages/settings.js">
+<link rel="modulepreload" href="js/pages/logs.js">
+<link rel="modulepreload" href="js/pages/about.js">
 </head>
 <body>
 	<header class="top-bar">

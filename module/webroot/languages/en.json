@@ -3,6 +3,7 @@
   "nav_home": "Home",
   "nav_props": "Props",
   "nav_settings": "Settings",
+  "nav_logs": "Logs",
   "nav_about": "About",
   "action_refresh": "Refresh",
   "opt_off": "Off",
@@ -23,6 +24,12 @@
   "set_hide_compact_desc": "Only used with the stock resetprop. Deleting a prop leaves a reclaimable hole in property storage; this compacts it. \"Touched areas only\" rebuilds just the areas Nyx changed; \"All areas\" can log harmless errors on devices with an unparseable area (e.g. telephony props). Reclaims the storage gap, not serial counters. Ignored when resetprop-rs is the backend.",
   "set_repeat_enabled_label": "Prop-preset repeat loop",
   "set_repeat_enabled_desc": "Master switch for the background loop that periodically re-applies any preset carrying a '# repeat:' header, for the rare prop that resets after boot. Turning it off stops the loop without a reboot. Inactive unless a preset opts in, and the loop is itself a detection signal, so leave it on only when a preset actually needs it.",
+  "set_group_updates": "Updates",
+  "set_disable_bin_update_label": "Skip resetprop-rs update check on open",
+  "set_disable_bin_update_desc": "On by default. Turn it off and opening the WebUI compares the installed resetprop-rs binary against the latest release, then offers to install it — nothing is ever replaced without asking.",
+  "set_bin_update_now_label": "Check resetprop-rs now",
+  "set_bin_update_now_action": "Check",
+  "set_bin_update_now_desc": "Compares hashes against the latest Enginex0/resetprop-rs release for this device's ABI. Works whether or not the check on open is enabled.",
   "about_credits_title": "Credits",
   "home_verify_title": "Verification",
   "home_verify_vbs": "Verified boot state",
@@ -58,5 +65,11 @@
   "about_license_copyright": "Copyright © 2026 poqdavid",
   "about_license_body": "NyxProps is free software under the GNU Affero General Public License v3.0 (AGPL-3.0-only). You may redistribute and modify it under that license. It comes with ABSOLUTELY NO WARRANTY.",
   "about_license_where": "License text and notices:",
-  "about_license_source": "Source code:"
+  "about_license_source": "Source code:",
+  "logs_tab_activity": "Activity",
+  "logs_activity_desc": "What NyxProps did at each boot stage: the backend it used, each preset it ran or skipped, and every prop it changed.",
+  "logs_loading": "Loading…",
+  "logs_empty": "Nothing logged this boot yet.",
+  "logs_truncated": "Showing the last {shown} of {total} lines.",
+  "logs_hint": "The log is rewritten at every boot. Newest at the bottom. Tap refresh in the top bar to reload."
 }

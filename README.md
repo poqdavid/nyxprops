@@ -13,6 +13,7 @@ Config-driven **device property spoofing** for **KernelSU / KernelSU-Next**, wit
 - ⏱️ **Stages and gates**: each preset runs at the service stage (default) or at boot-completed, and can be limited to an Android API range with `min_sdk` / `max_sdk`
 - 🔁 **Optional repeat**: a preset with a `# repeat: N` header is re-applied every N seconds, for the rare prop something resets after boot (off for every shipped preset)
 - 🥷 **Two backends**: the stock KernelSU/Magisk `resetprop` (default) or the bundled **resetprop-rs** for stealth writes and count-preserving deletes
+- ⬆️ **resetprop-rs updates**: compare the installed binary with the latest resetprop-rs release from the WebUI and install it in place, on demand or with an opt-in check when the WebUI opens
 - 🧹 **Prop-area rebuild**: after deletions, reclaims the storage holes they leave behind (touched areas, all areas, or off)
 - 🎨 **Material You WebUI**: boot status, verification checks, a live list of the props applied this boot, and an in-app preset editor
 - 📂 **Own config directory**: presets and settings live under `/data/adb/nyxprops`; your edits survive updates
@@ -41,9 +42,10 @@ SuSFS is not required. For path and mount hiding, pair it with **[NyxSUSFS](http
 
 ## 🖥️ WebUI
 
-- **Home**: whether presets were applied this boot and with which backend, verification checks (verified boot state, bootloader, dm-verity, security patch), counters for props applied and presets enabled, and device info
+- **Home**: whether presets were applied this boot and with which backend, verification checks (verified boot state, bootloader, dm-verity, security patch), counters for props applied and presets enabled, and device info. With the update check on, it also shows a notice when a different resetprop-rs build is published
 - **Props**: turn presets on or off, edit their rules, create new ones or delete them
-- **Settings**: prop backend, prop-area rebuild and the repeat loop master switch
+- **Settings**: prop backend, prop-area rebuild, the repeat loop master switch, and resetprop-rs updates (check now, or check each time the WebUI opens)
+- **Logs**: this boot's log (`props.log`): the backend used, each preset run or skipped, and every prop changed, newest at the bottom
 - **About**: appearance (theme, Material You, fullscreen) and credits
 
 Changes to presets and settings take effect on the next reboot.

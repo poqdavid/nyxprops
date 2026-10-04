@@ -24,12 +24,14 @@ Source code: <https://github.com/poqdavid/nyxprops>
 - **NyxSUSFS** by poqdavid, AGPL-3.0
   <https://github.com/poqdavid/nyxsusfs>
   NyxProps was split out of NyxSUSFS v1.0.0. Its prop engine, presets and
-  WebUI come from there.
+  WebUI come from there, and its resetprop-rs updater (`bin-update.sh` and
+  the WebUI side) is adapted from NyxSUSFS' susfs binary updater.
 - **ksu_module_susfs** by sidex15, AGPL-3.0
   <https://github.com/sidex15/ksu_module_susfs>
   Parts of the installer (`customize.sh`: the reset-settings prompt, the
-  download helper and the config merge) and the preamble of the boot scripts
-  come from this module, by way of NyxSUSFS.
+  download helper and the config merge), the download and connection-check
+  helpers in `bin-update.sh`, and the preamble of the boot scripts come from
+  this module, by way of NyxSUSFS.
 
 ## Ideas and data
 

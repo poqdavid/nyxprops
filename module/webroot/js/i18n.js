@@ -135,11 +135,13 @@ export async function setLanguage(code) {
  * the inline SAFETY set and keys.
  */
 export async function initI18n() {
-	english = await fetchTable('en');
+	// Both files are requested together: each one the manager serves can
+	// cost a root shell of its own, so there's no point waiting in line.
+	const [en] = await Promise.all([fetchTable('en'), loadManifest()]);
+	english = en;
 	if (!english) {
 		console.error('i18n: languages/en.json failed to load; using inline safety strings');
 	}
-	await loadManifest();
 	let saved = 'en';
 	try { saved = localStorage.getItem(STORAGE_KEY) || 'en'; } catch (_e) { /* ignore */ }
 	if (saved !== 'en' && available[saved]) {

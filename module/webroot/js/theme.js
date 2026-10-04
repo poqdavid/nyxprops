@@ -16,31 +16,37 @@ import { exec } from './ksu-bridge.js';
 let mediaQuery = null;
 let watching = false;
 
+// `cmd uimode night` answers yes/no/auto. When it says auto (or isn't
+// available) fall through to the raw secure setting, where
+// 2 = always dark, 1 = always light, 0 = auto. Exported so the startup read
+// can run it in the same shell as everything else (see ksu-bridge.js).
+export const NIGHT_MODE_COMMAND = [
+	'n=$(cmd uimode night 2>/dev/null)',
+	'case "$n" in',
+	'  *yes*) echo dark ;;',
+	'  *no*) echo light ;;',
+	'  *)',
+	'    v=$(settings get secure ui_night_mode 2>/dev/null)',
+	'    case "$v" in',
+	'      2) echo dark ;;',
+	'      1) echo light ;;',
+	'      *) echo unknown ;;',
+	'    esac',
+	'    ;;',
+	'esac',
+].join('\n');
+
+/** @returns {'dark'|'light'|null} null when Android can't say */
+export function parseNightMode({ errno, stdout }) {
+	if (errno !== 0) return null;
+	const answer = stdout.trim();
+	return answer === 'dark' || answer === 'light' ? answer : null;
+}
+
 /** @returns {Promise<'dark'|'light'|null>} null when Android can't say */
 async function querySystemNightMode() {
-	// `cmd uimode night` answers yes/no/auto. When it says auto (or isn't
-	// available) fall through to the raw secure setting, where
-	// 2 = always dark, 1 = always light, 0 = auto.
-	const cmd = [
-		'n=$(cmd uimode night 2>/dev/null)',
-		'case "$n" in',
-		'  *yes*) echo dark ;;',
-		'  *no*) echo light ;;',
-		'  *)',
-		'    v=$(settings get secure ui_night_mode 2>/dev/null)',
-		'    case "$v" in',
-		'      2) echo dark ;;',
-		'      1) echo light ;;',
-		'      *) echo unknown ;;',
-		'    esac',
-		'    ;;',
-		'esac',
-	].join('\n');
 	try {
-		const { errno, stdout } = await exec(cmd);
-		if (errno !== 0) return null;
-		const answer = stdout.trim();
-		return answer === 'dark' || answer === 'light' ? answer : null;
+		return parseNightMode(await exec(NIGHT_MODE_COMMAND));
 	} catch {
 		return null;
 	}
@@ -53,9 +59,13 @@ function mediaPrefersDark() {
 	return mediaQuery ? mediaQuery.matches : false;
 }
 
-/** The concrete scheme that "system" currently resolves to. */
-export async function resolveSystemTheme() {
-	const fromAndroid = await querySystemNightMode();
+/**
+ * The concrete scheme that "system" currently resolves to.
+ * @param {'dark'|'light'|null} [known] Android's answer when the caller
+ *   already has it (null = Android couldn't say); omitted = ask now.
+ */
+export async function resolveSystemTheme(known) {
+	const fromAndroid = known === undefined ? await querySystemNightMode() : known;
 	if (fromAndroid) return fromAndroid;
 	return mediaPrefersDark() ? 'dark' : 'light';
 }
@@ -66,14 +76,16 @@ export async function resolveSystemTheme() {
  * theme never depends on the WebView answering the media query correctly.
  *
  * @param {'system'|'light'|'dark'} mode
+ * @param {{systemNight?: 'dark'|'light'|null}} [opts] Android's night-mode
+ *   answer if already read (startup batches it), so "system" costs no exec.
  * @returns {Promise<'light'|'dark'>} the scheme actually applied
  */
-export async function applyTheme(mode) {
+export async function applyTheme(mode, { systemNight } = {}) {
 	const root = document.documentElement;
 	root.dataset.themeSource = mode;
 	let effective = mode;
 	if (mode !== 'light' && mode !== 'dark') {
-		effective = await resolveSystemTheme();
+		effective = await resolveSystemTheme(systemNight);
 		watchSystemChanges();
 	}
 	root.dataset.theme = effective;
@@ -129,14 +141,27 @@ async function waitForMonet(timeoutMs = 1200) {
 	return monetAvailable();
 }
 
+let monetRequest = 0;
+
 /**
  * Turns the Material You token overrides on or off.
+ *
+ * `wait: false` checks once instead of polling, for startup: the palette
+ * import is part of a render-blocking stylesheet, so it is normally there
+ * by the time any script runs, and holding the first render for up to
+ * 1.2s on a manager that never serves one isn't worth it. A later call
+ * wins: if the user flips the switch while an earlier call is still
+ * waiting, the earlier one leaves the page alone.
+ *
  * @param {boolean} enabled the user's preference
+ * @param {{wait?: boolean}} [opts]
  * @returns {Promise<{enabled:boolean, available:boolean}>}
  */
-export async function applyMonet(enabled) {
-	const available = enabled ? await waitForMonet() : monetAvailable();
+export async function applyMonet(enabled, { wait = true } = {}) {
+	const request = ++monetRequest;
+	const available = enabled && wait ? await waitForMonet() : monetAvailable();
 	const on = Boolean(enabled) && available;
+	if (request !== monetRequest) return { enabled: on, available };
 	if (on) {
 		document.documentElement.dataset.monet = 'on';
 	} else {

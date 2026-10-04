@@ -297,8 +297,11 @@ textarea.list-editor {
 	animation: nyx-spin .7s linear infinite;
 }
 @keyframes nyx-spin { to { transform: rotate(360deg); } }
-/* Keep the spinner (it conveys progress) but ease it for reduced-motion. */
-@media (prefers-reduced-motion: reduce) { .btn__spinner { animation-duration: 1.5s; } }
+/* The top-bar refresh icon turns (its own way round) while the page is
+   re-read - transform only, for the same compositor reason as above. */
+#refresh-btn.is-busy svg { animation: nyx-spin .8s linear infinite reverse; }
+/* Keep the spinners (they convey progress) but ease them for reduced-motion. */
+@media (prefers-reduced-motion: reduce) { .btn__spinner, #refresh-btn.is-busy svg { animation-duration: 1.5s; } }
 
 /* ---------- Chips (feature list on About) ---------- */
 .chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
@@ -440,6 +443,43 @@ textarea.list-editor {
 	line-height: 1.6;
 	tab-size: 4;
 }
+
+/* ---------- Logs ---------- */
+/* Activity / Kernel switch, a Material 3 segmented button. */
+.seg {
+	display: flex;
+	margin: 4px 0 16px;
+	border: 1px solid var(--md-outline);
+	border-radius: var(--md-shape-full);
+	overflow: hidden;
+}
+.seg__btn {
+	flex: 1;
+	border: none;
+	background: none;
+	color: var(--md-on-surface);
+	font: var(--md-type-label-lg);
+	padding: 10px 12px;
+	cursor: pointer;
+	transition: background .15s ease;
+}
+.seg__btn + .seg__btn { border-left: 1px solid var(--md-outline); }
+.seg__btn[aria-selected="true"] { background: var(--md-secondary-container); color: var(--md-on-secondary-container); }
+.log-view {
+	margin: 0;
+	max-height: 62vh;
+	overflow: auto;
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+	font: 12px/1.6 ui-monospace, 'Roboto Mono', monospace;
+	color: var(--md-on-surface);
+}
+.log-view.is-empty { color: var(--md-on-surface-variant); font: var(--md-type-body-md); }
+/* Hanging indent: a wrapped entry's continuation sits under its own text. */
+.log-line { padding-left: 2ch; text-indent: -2ch; }
+.log-note { margin: 0 0 8px; color: var(--md-on-surface-variant); font: var(--md-type-label-md); }
+.page-footnote { margin: 16px 4px 0; }
+.page-footnote code { font: 12px/1.5 ui-monospace, 'Roboto Mono', monospace; overflow-wrap: anywhere; }
 
 /* Five destinations need slightly tighter labels to avoid wrapping. */
 .nav-item { font-size: 11px; }

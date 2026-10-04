@@ -1,5 +1,7 @@
 import { getConfig, setConfigValue } from '../props-data.js';
-import { toast } from '../ksu-bridge.js';
+import { toast, nextPaint } from '../ksu-bridge.js';
+import { checkBinaryUpdate, applyBinaryUpdate, describeBinaryStatus } from '../bin-update.js';
+import { confirmDialog } from '../dialog.js';
 import { t, getAvailableLanguages, getCurrentLanguage, setLanguage } from '../i18n.js';
 
 // Every key here is one already shipped in config.sh.
@@ -20,6 +22,19 @@ const GROUPS = [
 			{
 				key: 'repeat_enabled', i18n: 'set_repeat_enabled_label', i18nDesc: 'set_repeat_enabled_desc', label: 'Prop-preset repeat loop', type: 'bool',
 				desc: "Master switch for the background loop that periodically re-applies any preset carrying a '# repeat:' header, for the rare prop that resets after boot. Turning it off stops the loop without a reboot. Inactive unless a preset opts in, and the loop is itself a detection signal, so leave it on only when a preset actually needs it.",
+			},
+		],
+	},
+	{
+		title: 'Updates', i18nTitle: 'set_group_updates',
+		items: [
+			{
+				key: 'disable_webui_bin_update', i18n: 'set_disable_bin_update_label', i18nDesc: 'set_disable_bin_update_desc', label: 'Skip resetprop-rs update check on open', type: 'bool',
+				desc: 'On by default. Turn it off and opening the WebUI compares the installed resetprop-rs binary against the latest release, then offers to install it — nothing is ever replaced without asking.',
+			},
+			{
+				key: 'bin_update_now', i18n: 'set_bin_update_now_label', i18nDesc: 'set_bin_update_now_desc', i18nAction: 'set_bin_update_now_action', label: 'Check resetprop-rs now', type: 'action', actionLabel: 'Check',
+				desc: "Compares hashes against the latest Enginex0/resetprop-rs release for this device's ABI. Works whether or not the check on open is enabled.",
 			},
 		],
 	},
@@ -58,6 +73,9 @@ function renderLanguageSelector(cardEl) {
 			renderSettingsShell(pageRoot);
 			refreshSettings(pageRoot);
 		}
+		// Pages keep what they rendered across tab switches now, so tell the
+		// app to re-read the others in the new language on their next visit.
+		document.dispatchEvent(new CustomEvent('nyx:language-changed'));
 	});
 }
 
@@ -128,13 +146,80 @@ export function renderSettingsShell(root) {
 		const el = e.target.closest('[data-key]');
 		if (!el) return;
 		const value = el.dataset.type === 'bool' ? (el.checked ? '1' : '0') : el.value;
+		// Show the flipped switch / picked option first; the write holds the page.
+		await nextPaint();
 		const { ok } = await setConfigValue(el.dataset.key, value);
 		toast(ok ? 'Saved — some settings need a reboot to apply' : 'Failed to save setting');
 	});
+
+	groupsEl.addEventListener('click', (e) => {
+		const btn = e.target.closest('[data-action="bin_update_now"]');
+		if (btn) runManualBinCheck(btn);
+	});
+}
+
+/** Put the button into its spinning "busy" state with a label. */
+function setBtnBusy(btn, label) {
+	btn.innerHTML = `<span class="btn__spinner" aria-hidden="true"></span>${label}`;
+}
+
+/**
+ * Manual binary check.
+ *
+ * Unlike the on-open check this reports every outcome, including "up to
+ * date" and "no connection": the user pressed a button, so an answer
+ * either way is the whole point. checkBinaryUpdate shares one in-flight
+ * request, so pressing this while an on-open check is still running joins
+ * that one instead of starting a second.
+ */
+async function runManualBinCheck(btn) {
+	const original = btn.innerHTML;
+	btn.disabled = true;
+	btn.classList.add('is-busy');
+	btn.setAttribute('aria-busy', 'true');
+	setBtnBusy(btn, 'Checking…');
+	// Paint the spinner before the (possibly main-thread-blocking) check runs.
+	await nextPaint();
+	try {
+		const result = await checkBinaryUpdate();
+		const notice = describeBinaryStatus(result);
+		if (result.status !== 'differs' && result.status !== 'missing') {
+			toast(notice ? [notice.title, notice.subtitle].filter(Boolean).join(' — ') : result.detail);
+			return;
+		}
+		// Replacing the binary the boot scripts run is never done without a
+		// confirmation. With the stock backend selected it isn't run at all,
+		// which is worth saying before the user downloads it. The backend is
+		// read off this page's own picker, which shows the saved value, so
+		// the dialog doesn't wait on another shell read.
+		const toolSelect = btn.closest('.page')?.querySelector('[data-key="prop_tool"]');
+		const message = [
+			result.detail,
+			result.latest ? `Latest release: ${result.latest}` : '',
+			(toolSelect?.value || 'magisk') === 'magisk'
+				? 'The prop backend is set to the stock resetprop, so this binary is not used until you switch it to Auto or resetprop-rs.'
+				: 'A reboot is needed for the boot scripts to use it.',
+		].filter(Boolean).join('\n\n');
+		if (!(await confirmDialog('Install the published resetprop-rs?', message, 'Install'))) return;
+
+		setBtnBusy(btn, 'Installing…');
+		await nextPaint();
+		const applied = await applyBinaryUpdate();
+		toast(applied.detail || 'Done');
+	} finally {
+		btn.disabled = false;
+		btn.classList.remove('is-busy');
+		btn.removeAttribute('aria-busy');
+		btn.innerHTML = original;
+	}
 }
 
 export async function refreshSettings(root) {
-	const config = await getConfig();
+	applySettingsConfig(root, await getConfig());
+}
+
+/** Set every control from a parsed config.sh (also used at startup). */
+export function applySettingsConfig(root, config) {
 	root.querySelectorAll('[data-key][data-type]').forEach((el) => {
 		const value = config[el.dataset.key];
 		if (el.dataset.type === 'bool') {

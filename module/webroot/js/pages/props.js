@@ -1,15 +1,44 @@
 import {
-	listPropPresets,
+	getPropsData,
 	getPropPreset,
 	setPropPreset,
 	setPropPresetEnabled,
 	deletePropPreset,
 	sanitisePresetFilename,
-	getCategoryEntries,
 } from '../props-data.js';
-import { toast } from '../ksu-bridge.js';
+import { toast, nextPaint } from '../ksu-bridge.js';
 import { openSheetLoading, openSheetWithList } from '../sheet.js';
 import { confirmDialog, promptDialog } from '../dialog.js';
+
+// The applied-props list behind the card at the top, from the same read
+// its count came from, so the card opens instantly.
+let lastApplied = null;
+
+// Home counts and lists the enabled presets, and pages keep what they
+// rendered across tab switches, so any change here tells the app to have
+// Home re-read on its next visit.
+function presetsChanged() {
+	document.dispatchEvent(new CustomEvent('nyx:presets-changed'));
+}
+
+/**
+ * Set the "# enabled:" line in preset text to match a switch, the same way
+ * setPropPresetEnabled rewrites the file: replace the first matching header,
+ * or append one if the preset has none. Used to keep an open editor's
+ * textarea in step with its toggle.
+ */
+function applyEnabledHeader(text, enabled) {
+	const val = enabled ? '1' : '0';
+	const lines = text.split('\n');
+	for (let i = 0; i < lines.length; i += 1) {
+		if (/^#[ \t]*enabled:/.test(lines[i])) {
+			lines[i] = `# enabled: ${val}`;
+			return lines.join('\n');
+		}
+	}
+	lines.push(`# enabled: ${val}`);
+	return lines.join('\n');
+}
 
 const NEW_PRESET_TEMPLATE = `# name: My preset
 # description: What this preset does
@@ -74,8 +103,12 @@ export function renderPropsShell(root) {
 	`;
 
 	root.querySelector('[data-role="applied"]').addEventListener('click', async () => {
-		openSheetLoading('Props applied this boot');
-		const entries = await getCategoryEntries('prop');
+		let entries = lastApplied;
+		if (!entries) {
+			openSheetLoading('Props applied this boot');
+			await nextPaint();
+			entries = (await getPropsData()).applied;
+		}
 		openSheetWithList('Props applied this boot', entries,
 			'No props were applied this boot. Either every preset is disabled, or none of their rules matched this device.');
 	});
@@ -92,6 +125,8 @@ export function renderPropsShell(root) {
 			toast('That name has no usable characters');
 			return;
 		}
+		// Let the dialog close on screen before the shell calls hold the page.
+		await nextPaint();
 		const existing = await getPropPreset(file);
 		if (existing) {
 			toast(`${file} already exists`);
@@ -99,7 +134,10 @@ export function renderPropsShell(root) {
 		}
 		const { ok } = await setPropPreset(file, NEW_PRESET_TEMPLATE);
 		toast(ok ? `Created ${file}` : `Failed to create ${file}`);
-		if (ok) refreshProps(root);
+		if (ok) {
+			presetsChanged();
+			refreshProps(root);
+		}
 	});
 
 	const listEl = root.querySelector('[data-role="list"]');
@@ -108,9 +146,21 @@ export function renderPropsShell(root) {
 	listEl.addEventListener('change', async (e) => {
 		const input = e.target.closest('input[data-file]');
 		if (!input) return;
+		// Show the flipped switch first; the write holds the page.
+		await nextPaint();
 		const { ok } = await setPropPresetEnabled(input.dataset.file, input.checked);
 		if (ok) {
 			toast(`${input.checked ? 'Enabled' : 'Disabled'} — reboot to apply`);
+			// If this preset's editor is open, its textarea was loaded before
+			// the toggle and still holds the old "# enabled:" line. Patch it to
+			// match, or a later Save would write the old header back and undo
+			// the toggle. Any unsaved rule edits in the textarea are kept.
+			const details = listEl.querySelector(`details[data-file="${input.dataset.file}"]`);
+			if (details && details.dataset.loaded) {
+				const ta = details.querySelector('[data-role="editor"]');
+				ta.value = applyEnabledHeader(ta.value, input.checked);
+			}
+			presetsChanged();
 		} else {
 			toast('Failed to update preset');
 			input.checked = !input.checked;
@@ -122,6 +172,8 @@ export function renderPropsShell(root) {
 		const details = e.target;
 		if (details.tagName !== 'DETAILS' || !details.open || details.dataset.loaded) return;
 		const textarea = details.querySelector('[data-role="editor"]');
+		// Let the editor open on screen before the read holds the page.
+		await nextPaint();
 		textarea.value = await getPropPreset(details.dataset.file);
 		details.dataset.loaded = '1';
 	}, true);
@@ -133,28 +185,37 @@ export function renderPropsShell(root) {
 
 		if (e.target.dataset.role === 'save') {
 			const textarea = details.querySelector('[data-role="editor"]');
+			await nextPaint();
 			const { ok } = await setPropPreset(file, textarea.value);
 			toast(ok ? `Saved ${file} — reboot to apply` : `Failed to save ${file}`);
-			if (ok) refreshProps(details.closest('.page'));
+			if (ok) {
+				presetsChanged();
+				refreshProps(details.closest('.page'));
+			}
 		}
 
 		if (e.target.dataset.role === 'delete') {
 			const sure = await confirmDialog('Delete preset', `Delete ${file}? This can't be undone.`, 'Delete');
 			if (!sure) return;
+			await nextPaint();
 			const { ok } = await deletePropPreset(file);
 			toast(ok ? `Deleted ${file}` : `Failed to delete ${file}`);
-			if (ok) refreshProps(details.closest('.page'));
+			if (ok) {
+				presetsChanged();
+				refreshProps(details.closest('.page'));
+			}
 		}
 	});
 }
 
 export async function refreshProps(root) {
 	if (!root) return;
-	const [presets, applied] = await Promise.all([
-		listPropPresets(),
-		getCategoryEntries('prop'),
-	]);
+	renderProps(root, await getPropsData());
+}
 
+/** Fill the page from a getPropsData() result (also used at startup). */
+export function renderProps(root, { presets, applied }) {
+	lastApplied = applied;
 	root.querySelector('[data-role="applied-count"]').textContent = applied.length;
 
 	const listEl = root.querySelector('[data-role="list"]');

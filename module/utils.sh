@@ -160,7 +160,12 @@ nyx_rebuild_touched_areas() {
             nyx_tag_log prop_rebuild_warn "no surviving prop in $_ctx to scope a rebuild"
             continue
         fi
-        _out=$(resetprop -Z "$_rep" -c 2>&1)
+        # Flags BEFORE the name: resetprop stops reading options at the
+        # first non-option arg, so `resetprop -Z "$_rep" -c` would treat
+        # -c as a value and SET "$_rep" to the literal "-c" (one wrecked
+        # prop per touched area). `-c -Z NAME` rebuilds the area holding
+        # NAME, as documented.
+        _out=$(resetprop -c -Z "$_rep" 2>&1)
         case "$_out" in
             *"failed to rebuild"* | *"corrupted"*)
                 nyx_tag_log prop_rebuild_warn "$_ctx: $(echo "$_out" | grep -iE 'failed to rebuild|corrupted' | head -n 1)"
