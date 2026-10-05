@@ -127,7 +127,7 @@ jobs:
                   esc() { sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g'; }
 
                   SHORT_SHA=$(git rev-parse --short HEAD)
-                  SUBJECT=$(git log -1 --pretty=%s | esc)
+                  SUBJECT=$(git log -1 --pretty=%s -i --invert-grep --grep="ci: bump" | esc)
 
                   CAPTION="<b>NyxProps CI Build #${RUN_NUMBER}: ${SHORT_SHA}</b>"
                   CAPTION+=$'\n\n'"${SUBJECT}"
@@ -192,9 +192,9 @@ jobs:
                   else
                     RANGE="$TAG"
                   fi
-                  CHANGELOG=$(git log --pretty=format:'- %s' "$RANGE" | head -n 20 | esc)
+                  CHANGELOG=$(git log --pretty=format:'- %s' "$RANGE" -i --invert-grep --grep="ci: bump" | head -n 20 | esc)
                   if [ -z "$CHANGELOG" ]; then
-                    CHANGELOG="- $(git log -1 --pretty=%s | esc)"
+                    CHANGELOG="- $(git log -1 --pretty=%s -i --invert-grep --grep="ci: bump" | esc)"
                   fi
 
                   CAPTION="<b>NyxProps ${VERSION}</b>"

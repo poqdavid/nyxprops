@@ -1,5 +1,16 @@
 # Changelog
 
+## [v1.5.0] - 2026-10-05
+
+### ✨ Features
+
+* **`{vendor_patch}` value token — a self-maintaining vendor security-patch date.** Resolves to the current month's `YYYY-MM-05`, but steps back one month while the 5th is still in the future (the 1st–4th of a month), so the vendor patch date never runs ahead of the calendar — a future-dated patch level is itself an impossibility a checker could flag. It's computed on-device from the clock, like `{security_patch}` and `{yyyy_mm}`, with no network or external file. The **Security patch level** preset now uses `{security_patch}` for the OS prop (`YYYY-MM-01`) and `{vendor_patch}` for the vendor prop; both are documented in the new-preset template.
+
+### 📝 Notes
+
+* If a keystore/attestation spoofer (TrickyStore, OhMyKeymint, TEESimulator) is set to present the *system property* for its patch levels, it mirrors whatever these props hold — so setting the props with this preset keeps the property and the attestation in agreement, with nothing to configure. A spoofer pinned to a fixed date should be matched to that date by editing the preset's values directly.
+* As before, this only makes the **properties** current and self-consistent. Hardware key attestation's own `osPatchLevel` / `vendorPatchLevel` live in the TEE and can't be changed by any property.
+
 ## [v1.4.0] - 2026-10-04
 
 

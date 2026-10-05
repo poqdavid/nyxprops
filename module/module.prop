@@ -1,7 +1,7 @@
 id=nyxprops
 name=NyxProps
-version=v1.4.0
-versionCode=140
+version=v1.5.0
+versionCode=150
 author=poqdavid
 description=[Status: Waiting for reboot] Config-driven device property spoofing presets for KernelSU/KernelSU-Next, with a Material You WebUI.
 updateJson=https://raw.githubusercontent.com/poqdavid/nyxprops/main/update.json

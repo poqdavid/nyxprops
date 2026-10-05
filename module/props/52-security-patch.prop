@@ -1,8 +1,18 @@
 # name: Security patch level
-# description: Report a current security patch date, so a stale one on a custom ROM isn't a flag. OS -> current YYYY-MM-01, vendor -> YYYY-MM-05. Off by default: a patch date newer than this build's fingerprint is itself an inconsistency, so enable knowingly. 'reset' only rewrites a prop that already exists and differs.
+# description: Report a current security patch date, so a stale one on a custom ROM isn't a flag. OS -> current YYYY-MM-01, vendor -> YYYY-MM-05 (stepped back a month on the 1st-4th so it's never a future date). Off by default: a patch date newer than this build's fingerprint is itself an inconsistency, so enable knowingly. 'reset' only rewrites a prop that already exists and differs.
 # enabled: 0
 # stage: post-fs-data
 # (runs before zygote so the framework's Build.* value matches this property)
 
+# {security_patch} -> current YYYY-MM-01 (OS patch convention).
+# {vendor_patch}   -> current YYYY-MM-05, rolled back one month while the 5th
+#                     is still in the future, so it never names a date ahead of
+#                     the calendar. If a keystore spoofer (TrickyStore /
+#                     OhMyKeymint / TEESimulator) is set to present the system
+#                     property, it mirrors these, so prop and attestation agree.
+# Note: hardware key attestation's own osPatchLevel/vendorPatchLevel live in
+# the TEE and can't be changed by a property - this only makes the PROPERTIES
+# current and self-consistent.
+
 reset  ro.build.version.security_patch  {security_patch}
-reset  ro.vendor.build.security_patch   {yyyy_mm}-05
+reset  ro.vendor.build.security_patch   {vendor_patch}

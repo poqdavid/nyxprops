@@ -83,6 +83,8 @@ const NEW_PRESET_TEMPLATE = `# name: My preset
 # Value tokens (resolved when the preset is applied):
 #   {avb_version}     device AVB version     {vbmeta_size}   configured vbmeta size
 #   {security_patch}  current YYYY-MM-01     {yyyy_mm}       current YYYY-MM
+#   {vendor_patch}    current YYYY-MM-05, rolled back a month until the 5th
+#                     arrives, so it never names a future date
 
 # reset  ro.example.prop  somevalue
 `;

@@ -198,14 +198,48 @@ nyx_resolve_avb_version() {
     fi
 }
 
+nyx_decimal() {
+    _dec=$1
+    while [ "${_dec#0}" != "$_dec" ] && [ -n "${_dec#0}" ]; do
+        _dec=${_dec#0}
+    done
+    echo "${_dec:-0}"
+}
+
 nyx_resolve_prop_dates() {
     yyyy_mm=$(date +%Y-%m 2> /dev/null)
+    _nd_day=$(date +%d 2> /dev/null)
     case "$yyyy_mm" in
-        [0-9][0-9][0-9][0-9]-[0-9][0-9]) security_patch="${yyyy_mm}-01" ;;
+        [0-9][0-9][0-9][0-9]-[0-9][0-9])
+            security_patch="${yyyy_mm}-01"
+            ;;
         *)
             yyyy_mm=''
             security_patch=''
+            vendor_patch=''
+            return 0
             ;;
+    esac
+
+    _vp_y=$(nyx_decimal "${yyyy_mm%-*}")
+    _vp_m=$(nyx_decimal "${yyyy_mm#*-}")
+    case "$_nd_day" in
+        '' | *[!0-9]*) _vp_d=5 ;; # no usable day -> don't roll back
+        *) _vp_d=$(nyx_decimal "$_nd_day") ;;
+    esac
+    if [ "$_vp_d" -lt 5 ] 2> /dev/null; then
+        if [ "$_vp_m" -le 1 ] 2> /dev/null; then
+            _vp_y=$((_vp_y - 1))
+            _vp_m=12
+        else
+            _vp_m=$((_vp_m - 1))
+        fi
+    fi
+    case "$_vp_m" in [0-9]) _vp_m="0$_vp_m" ;; esac
+    vendor_patch="${_vp_y}-${_vp_m}-05"
+    case "$vendor_patch" in
+        [0-9][0-9][0-9][0-9]-[0-9][0-9]-05) ;;
+        *) vendor_patch='' ;;
     esac
 }
 
@@ -447,6 +481,16 @@ nyx_apply_prop_presets() {
                     fi
                     ;;
             esac
+            case "$_line" in
+                *'{vendor_patch}'*)
+                    if [ -n "$vendor_patch" ]; then
+                        _line=$(echo "$_line" | sed "s/{vendor_patch}/${vendor_patch}/g")
+                    else
+                        nyx_tag_log prop_skip "unresolved {vendor_patch}: $_line"
+                        continue
+                    fi
+                    ;;
+            esac
 
             # shellcheck disable=SC2086
             set -- $_line
@@ -544,6 +588,11 @@ nyx_apply_single_preset() {
         case "$_line" in
             *'{yyyy_mm}'*)
                 if [ -n "$yyyy_mm" ]; then _line=$(echo "$_line" | sed "s/{yyyy_mm}/${yyyy_mm}/g"); else continue; fi
+                ;;
+        esac
+        case "$_line" in
+            *'{vendor_patch}'*)
+                if [ -n "$vendor_patch" ]; then _line=$(echo "$_line" | sed "s/{vendor_patch}/${vendor_patch}/g"); else continue; fi
                 ;;
         esac
         # shellcheck disable=SC2086
