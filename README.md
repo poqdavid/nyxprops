@@ -55,6 +55,12 @@ The boot-stage logic is **Rust** (`src/`); the `*.sh` stage files are thin wrapp
 
 ---
 
+## 🧪 Tests
+
+The boot stages, the WebUI and the installer are tested in CI on every push. See [tests/README.md](tests/README.md) to run the tests locally.
+
+---
+
 ## 💬 Support
 
 If you encounter any issues or need help, feel free to:

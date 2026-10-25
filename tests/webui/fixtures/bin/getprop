@@ -1,0 +1,6 @@
+#!/bin/sh
+# The device's props: one file per prop in the test root's
+# data/adb/nyxtest/props, so a check can change them.
+f="${NYX_TEST_ROOT}/data/adb/nyxtest/props/$1"
+[ -n "$1" ] && [ -f "$f" ] && cat "$f"
+echo

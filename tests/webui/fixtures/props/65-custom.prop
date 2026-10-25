@@ -1,0 +1,10 @@
+# name: Custom & <odd> name
+# description: A user preset with every header
+# stage: post-fs-data
+# min_sdk: 30
+# max_sdk: 35
+# enabled: 0
+
+reset ro.example.one 1
+missing ro.example.two 2
+# reset ro.example.commented 3

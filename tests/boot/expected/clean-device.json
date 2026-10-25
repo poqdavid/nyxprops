@@ -1,0 +1,118 @@
+{
+ "scenario": "clean-device",
+ "stages": [
+  {
+   "stage": "post-fs-data",
+   "exit": 0,
+   "output": "",
+   "calls": [
+    "resetprop [ro.boot.avb_version]",
+    "date [+%Y-%m-%d]",
+    "resetprop [ro.build.version.sdk]",
+    "resetprop [ro.debuggable]",
+    "resetprop [ro.force.debuggable]",
+    "resetprop [ro.secure]",
+    "resetprop [ro.adb.secure]",
+    "resetprop [ro.build.type]",
+    "resetprop [ro.build.tags]",
+    "resetprop [ro.build.keys]"
+   ],
+   "props": {},
+   "changed": {
+    "/data/adb/ksu/nyxprops/logs": [
+     "0o755",
+     "0:0",
+     null
+    ],
+    "/data/adb/ksu/nyxprops/logs/props.log": [
+     "0o644",
+     "0:0",
+     "nyxprops/boot: [logging_initialized]\n[boot_id]: nyxprops <boot_id>\n[prop_tool]: nyxprops magisk\n[prop_preset]: nyxprops 40-debuggable.prop\n[prop_preset]: nyxprops 50-build-type.prop\n[prop_preset_skipped]: nyxprops 52-security-patch.prop\n[prop_preset_skipped]: nyxprops 97-fingerprint.prop\n"
+    ]
+   },
+   "removed": []
+  },
+  {
+   "stage": "service",
+   "exit": 0,
+   "output": "",
+   "calls": [
+    "resetprop [-w] [sys.boot_completed] [0]",
+    "resetprop [ro.boot.avb_version]",
+    "date [+%Y-%m-%d]",
+    "resetprop [ro.build.version.sdk]",
+    "resetprop [ro.boot.vbmeta.invalidate_on_error]",
+    "resetprop [ro.boot.vbmeta.avb_version]",
+    "resetprop [ro.boot.vbmeta.hash_alg]",
+    "resetprop [ro.boot.vbmeta.size]",
+    "resetprop [ro.boot.vbmeta.device_state]",
+    "resetprop [vendor.boot.vbmeta.device_state]",
+    "resetprop [ro.boot.avb_version]",
+    "resetprop [ro.boot.verifiedbootstate]",
+    "resetprop [ro.boot.flash.locked]",
+    "resetprop [ro.boot.veritymode]",
+    "resetprop [vendor.boot.verifiedbootstate]",
+    "resetprop [ro.is_ever_orange]",
+    "resetprop",
+    "resetprop",
+    "resetprop",
+    "resetprop",
+    "resetprop [ro.boot.warranty_bit]",
+    "resetprop [ro.warranty_bit]",
+    "resetprop [ro.vendor.boot.warranty_bit]",
+    "resetprop [ro.vendor.warranty_bit]",
+    "resetprop [ro.allow.mock.location]",
+    "resetprop [sys.oem_unlock_allowed]",
+    "resetprop [ro.secureboot.lockstate]",
+    "resetprop [ro.boot.realmebootstate]",
+    "resetprop [ro.boot.realme.lockstate]",
+    "resetprop [ro.bootmode]",
+    "resetprop [ro.boot.bootmode]",
+    "resetprop [vendor.boot.bootmode]",
+    "resetprop [persist.sys.usb.config]",
+    "resetprop [ro.kernel.qemu]",
+    "resetprop [ro.crypto.state]",
+    "resetprop"
+   ],
+   "props": {},
+   "changed": {
+    "/data/adb/ksu/nyxprops/logs/props.log": [
+     "0o644",
+     "0:0",
+     "(appended)\n[prop_preset]: nyxprops 10-vbmeta.prop\n[prop_preset]: nyxprops 20-verified-boot.prop\n[prop_preset]: nyxprops 25-verified-boot-errors.prop\n[prop_preset]: nyxprops 30-warranty.prop\n[prop_preset]: nyxprops 44-mock-location.prop\n[prop_preset_skipped]: nyxprops 53-build-date.prop\n[prop_preset_skipped]: nyxprops 54-verified-boot-hash.prop\n[prop_preset]: nyxprops 60-oem-unlock.prop\n[prop_preset_skipped]: nyxprops 61-oem-unlock-sdk36.prop (sdk 34 < min_sdk 36)\n[prop_preset]: nyxprops 70-oem-vendor.prop\n[prop_preset]: nyxprops 80-recovery-bootmode.prop\n[prop_preset]: nyxprops 86-usb-config.prop\n[prop_preset]: nyxprops 90-emulator.prop\n[prop_preset]: nyxprops 95-encryption.prop\n[prop_preset]: nyxprops 96-crashrecovery.prop\n[prop_preset_skipped]: nyxprops 98-rom-props.prop\n"
+    ]
+   },
+   "removed": []
+  },
+  {
+   "stage": "boot-completed",
+   "exit": 0,
+   "output": "",
+   "calls": [
+    "resetprop [ro.boot.avb_version]",
+    "date [+%Y-%m-%d]",
+    "resetprop [ro.build.version.sdk]",
+    "resetprop [init.svc.adbd]",
+    "resetprop [init.svc_debug_pid.adbd]",
+    "resetprop",
+    "resetprop",
+    "resetprop [ro.build.version.sdk]"
+   ],
+   "props": {},
+   "changed": {
+    "/data/adb/ksu/nyxprops/logs/props.log": [
+     "0o644",
+     "0:0",
+     "(appended)\n[prop_preset]: nyxprops 85-adb-state.prop\n"
+    ],
+    "/data/adb/modules/nyxprops/module.prop": [
+     "0o644",
+     "0:0",
+     "id=nyxprops\nname=NyxProps\nversion=<module.prop>\nversionCode=<module.prop>\nauthor=poqdavid\ndescription=[✅ Active] 16/21 presets enabled · stock resetprop — details in the WebUI\nupdateJson=https://raw.githubusercontent.com/poqdavid/nyxprops/main/update.json\n"
+    ]
+   },
+   "removed": []
+  }
+ ],
+ "repeat": null
+}

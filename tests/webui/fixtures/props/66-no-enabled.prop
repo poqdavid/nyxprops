@@ -1,0 +1,4 @@
+# name: No enabled header
+# stage: boot-completed
+# min_sdk: 34
+delete ro.example.three

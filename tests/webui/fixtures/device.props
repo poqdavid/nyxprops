@@ -1,0 +1,9 @@
+ro.build.version.release=15
+ro.build.version.sdk=35
+ro.product.model=SM-A155F
+ro.product.manufacturer=samsung
+ro.product.cpu.abi=arm64-v8a
+ro.boot.verifiedbootstate=green
+ro.boot.flash.locked=1
+ro.boot.veritymode=enforcing
+ro.build.version.security_patch=2026-10-01
