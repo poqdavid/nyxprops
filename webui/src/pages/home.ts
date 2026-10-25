@@ -170,10 +170,9 @@ export function renderHome(root: HTMLElement, data: HomeData): void {
 
 	$(root, '[data-role="verify"]').innerHTML = verify.map(checkRowHtml).join('');
 
-	$(root, '[data-role="device"]').innerHTML = [
-		infoRowHtml(t('home_device_model', 'Model'), device.model),
-		infoRowHtml(t('home_device_android', 'Android'), device.android),
-	].join('');
+	$(root, '[data-role="device"]').innerHTML = [infoRowHtml(t('home_device_model', 'Model'), device.model), infoRowHtml(t('home_device_android', 'Android'), device.android)].join(
+		'',
+	);
 
 	$(root, '[data-role="stats"]').innerHTML = `
 		<button class="stat-card" data-category="applied">

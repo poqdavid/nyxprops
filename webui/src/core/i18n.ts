@@ -55,7 +55,7 @@ async function loadManifest(): Promise<void> {
 				available = { en: 'English', ...(json as Table) };
 			}
 		}
-	} catch { }
+	} catch {}
 }
 
 function persist(code: string): void {

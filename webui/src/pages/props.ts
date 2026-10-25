@@ -1,13 +1,4 @@
-import {
-	getPropsData,
-	getPropPreset,
-	setPropPreset,
-	setPropPresetEnabled,
-	deletePropPreset,
-	sanitisePresetFilename,
-	type Preset,
-	type PropsData,
-} from '../props-data';
+import { getPropsData, getPropPreset, setPropPreset, setPropPresetEnabled, deletePropPreset, sanitisePresetFilename, type Preset, type PropsData } from '../props-data';
 import { $, closestTarget, escapeHtml } from '../core/dom';
 import { toast, nextPaint } from '../core/ksu-bridge';
 import { openSheetLoading, openSheetWithList } from '../core/sheet';
@@ -115,11 +106,7 @@ export function renderPropsShell(root: HTMLElement): void {
 			await nextPaint();
 			entries = (await getPropsData()).applied;
 		}
-		openSheetWithList(
-			'Props applied this boot',
-			entries,
-			'No props were applied this boot. Either every preset is disabled, or none of their rules matched this device.',
-		);
+		openSheetWithList('Props applied this boot', entries, 'No props were applied this boot. Either every preset is disabled, or none of their rules matched this device.');
 	});
 
 	$(root, '[data-role="new"]').addEventListener('click', async () => {

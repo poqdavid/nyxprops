@@ -42,7 +42,6 @@ export function renderLogs(root: HTMLElement, { text, total }: LogData): void {
 	}
 	const shown = body ? body.split('\n').length : 0;
 	note.hidden = total <= shown;
-	note.textContent =
-		total > shown ? t('logs_truncated', 'Showing the last {shown} of {total} lines.').replace('{shown}', String(shown)).replace('{total}', String(total)) : '';
+	note.textContent = total > shown ? t('logs_truncated', 'Showing the last {shown} of {total} lines.').replace('{shown}', String(shown)).replace('{total}', String(total)) : '';
 	scrollToNewest(el);
 }

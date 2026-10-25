@@ -1,0 +1,3 @@
+shell=busybox
+source-path=SCRIPTDIR
+external-sources=true
