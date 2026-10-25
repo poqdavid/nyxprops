@@ -19,3 +19,6 @@ module/bin/nyxprops-*
 Thumbs.db
 # The WebUI script is bundled from webui/src at build time (npm run build)
 module/webroot/js/
+
+# Python bytecode from the CI scripts and tests
+__pycache__/
