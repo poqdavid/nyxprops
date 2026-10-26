@@ -373,6 +373,7 @@ async function functional(browser) {
 	await settle(page);
 	snap.after_disable_bin_update = cfgVal('disable_webui_bin_update');
 	snap.config_after_settings = readConfig().split('\n').filter((l) => l.trim() && !l.startsWith('#')).join('\n');
+	snap.config_final_newline = readConfig().endsWith('\n');
 
 	const bin = '[data-action="bin_update_now"]';
 	snap.bin = {};

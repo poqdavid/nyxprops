@@ -16,6 +16,12 @@ export interface WriteResult {
 
 const NO_RESULT: ExecResult = { errno: 1, stdout: '', stderr: '' };
 
+// exec returns output without its final newline, so a file read and written
+// back would lose it. Every file the WebUI writes ends with one.
+function withFinalNewline(text: string): string {
+	return text === '' || text.endsWith('\n') ? text : `${text}\n`;
+}
+
 function withPrefix(prefix: string, commands: Record<string, string>): Record<string, string> {
 	const out: Record<string, string> = {};
 	for (const [key, cmd] of Object.entries(commands)) out[`${prefix}${key}`] = cmd;
@@ -117,7 +123,7 @@ async function writeConfigValue(key: string, value: string | number): Promise<Wr
 		lines.push(`${key}=${literal}`, '');
 	}
 
-	const b64 = btoa(unescape(encodeURIComponent(lines.join('\n'))));
+	const b64 = btoa(unescape(encodeURIComponent(withFinalNewline(lines.join('\n')))));
 	const write = await exec(`echo '${b64}' | base64 -d > '${CONFIG_PATH}'`);
 	return { ok: write.errno === 0, error: write.stderr };
 }
@@ -224,7 +230,7 @@ export async function getPropPreset(file: string): Promise<string> {
 
 export async function setPropPreset(file: string, contents: string): Promise<WriteResult> {
 	if (!isSafePresetFilename(file)) return { ok: false, error: 'invalid preset filename' };
-	const b64 = btoa(unescape(encodeURIComponent(contents)));
+	const b64 = btoa(unescape(encodeURIComponent(withFinalNewline(contents))));
 	const { errno, stderr } = await exec(`mkdir -p '${PROPS_DIR}' && echo '${b64}' | base64 -d > '${PROPS_DIR}/${file}'`);
 	return { ok: errno === 0, error: stderr };
 }

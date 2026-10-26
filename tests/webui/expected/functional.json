@@ -119,8 +119,8 @@
   "same": false
  },
  "save_unchanged": {
-  "sameAsDefault": false,
-  "sameButFinalNewline": true
+  "sameAsDefault": true,
+  "sameButFinalNewline": false
  },
  "saved_66": {
   "disk": "# name: Edited in the WebUI\n# max_sdk: 33\nreset ro.a 1\nmissing ro.b two words\n# reset ro.c 3",
@@ -176,6 +176,7 @@
  "after_repeat_enabled": "0",
  "after_disable_bin_update": "0",
  "config_after_settings": "prop_tool='auto'\ndisable_webui_bin_update=0\nrepeat_enabled=0\nrepeat_min_interval=30\nhide_compact='off'\navb_version='auto'\nwebui_theme='system'\nwebui_monet=0\nwebui_fullscreen=1\nvbmeta_size=13696",
+ "config_final_newline": true,
  "bin": {
   "differs_auto": "Install the published resetprop-rs?\nstub detail for differs\nLatest release: v9.9.9\nA reboot is needed for the boot scripts to use it.\nCancel\nInstall",
   "differs_stock": "Install the published resetprop-rs?\nstub detail for differs\nLatest release: v9.9.9\nThe prop backend is set to the stock resetprop, so this binary is not used until you switch it to Auto or resetprop-rs.\nCancel\nInstall",
