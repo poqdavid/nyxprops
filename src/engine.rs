@@ -302,6 +302,13 @@ impl Engine {
             v
         };
         for raw in lines {
+            // Blank lines and comments are skipped before tokens are resolved,
+            // so a comment that mentions a token is never reported.
+            match text::fields(&raw).first() {
+                None => continue,
+                Some(f) if f.starts_with('#') => continue,
+                Some(_) => {}
+            }
             let line = match self.resolve_tokens(raw.clone()) {
                 Ok(l) => l,
                 Err(tok) => {
@@ -312,12 +319,6 @@ impl Engine {
                 }
             };
             let fields = text::fields(&line);
-            if fields.is_empty() {
-                continue;
-            }
-            if fields[0].starts_with('#') {
-                continue;
-            }
             if fields.len() < 2 {
                 if let OnSkip::Log = on_skip {
                     self.log("prop_error", &format!("malformed line in {file}: {line}"));
