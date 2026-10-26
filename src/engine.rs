@@ -433,13 +433,13 @@ fn grep_e(pattern: &str, names: &[String]) -> Vec<String> {
     }
 }
 
+/// The first line of resetprop's rebuild output that reports a failed or
+/// corrupted area, in any letter case. resetprop exits 0 either way.
 fn rebuild_error(out: &str) -> Option<&str> {
-    if out.contains("failed to rebuild") || out.contains("corrupted") {
-        out.lines()
-            .find(|l| l.to_ascii_lowercase().contains("failed to rebuild") || l.to_ascii_lowercase().contains("corrupted"))
-    } else {
-        None
-    }
+    out.lines().find(|l| {
+        let l = l.to_ascii_lowercase();
+        l.contains("failed to rebuild") || l.contains("corrupted")
+    })
 }
 
 pub fn preset_sdk_ok(h: &Headers, dev_sdk: Option<&str>) -> bool {
@@ -503,6 +503,22 @@ mod tests {
         assert_eq!(name_from_dump_line("[ro.y]: value").as_deref(), Some("ro.y"));
         assert_eq!(name_from_dump_line("[ro.z]:no-space"), None);
         assert_eq!(name_from_dump_line("junk"), None);
+    }
+
+    #[test]
+    fn rebuild_error_any_case() {
+        let out = "resetprop: rebuilding\nresetprop: Failed to rebuild u:object_r:radio_prop:s0\n";
+        assert_eq!(rebuild_error(out), Some("resetprop: Failed to rebuild u:object_r:radio_prop:s0"));
+        assert_eq!(
+            rebuild_error("radio_prop: area CORRUPTED, skipped"),
+            Some("radio_prop: area CORRUPTED, skipped")
+        );
+        assert_eq!(
+            rebuild_error("resetprop: failed to rebuild x\n"),
+            Some("resetprop: failed to rebuild x")
+        );
+        assert_eq!(rebuild_error("resetprop: rebuilt 3 areas\n"), None);
+        assert_eq!(rebuild_error(""), None);
     }
 
     #[test]
