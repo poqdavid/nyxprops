@@ -67,7 +67,7 @@
   "about_license_where": "License text and notices:",
   "about_license_source": "Source code:",
   "logs_tab_activity": "Activity",
-  "logs_activity_desc": "What NyxProps did at each boot stage: the backend it used, each preset it ran or skipped, and every prop it changed.",
+  "logs_activity_desc": "What NyxProps did at each boot stage: the backend it used, each preset it ran or skipped, every prop it changed, and any write that failed.",
   "logs_loading": "Loading…",
   "logs_empty": "Nothing logged this boot yet.",
   "logs_truncated": "Showing the last {shown} of {total} lines.",

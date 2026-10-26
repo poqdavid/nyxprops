@@ -42,7 +42,7 @@ SuSFS is not required. For path and mount hiding, pair it with **[NyxSUSFS](http
 - **Home**: whether presets were applied this boot and with which backend, verification checks (verified boot state, bootloader, dm-verity, security patch), counters for props applied and presets enabled, and device info. With the update check on, it also shows a notice when a different resetprop-rs build is published
 - **Props**: turn presets on or off, edit their rules, create new ones or delete them
 - **Settings**: prop backend, prop-area rebuild, the repeat loop master switch, and resetprop-rs updates (check now, or check each time the WebUI opens)
-- **Logs**: this boot's log (`props.log`): the backend used, each preset run or skipped, and every prop changed, newest at the bottom
+- **Logs**: this boot's log (`props.log`): the backend used, each preset run or skipped, every prop changed and any write that failed, newest at the bottom
 - **About**: appearance (theme, Material You, fullscreen) and credits
 
 Changes to presets and settings take effect on the next reboot.

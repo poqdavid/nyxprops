@@ -9,7 +9,7 @@ export function renderLogsShell(root: HTMLElement): void {
 			<p class="log-note" data-role="note" hidden></p>
 			<div class="log-view is-empty" data-role="log">${t('logs_loading', 'Loading…')}</div>
 		</div>
-		<p class="setting-row__desc page-footnote">${t('logs_activity_desc', 'What NyxProps did at each boot stage: the backend it used, each preset it ran or skipped, and every prop it changed.')} ${t('logs_hint', 'The log is rewritten at every boot. Newest at the bottom. Tap refresh in the top bar to reload.')}<br><code>${LOG_PATH}</code></p>
+		<p class="setting-row__desc page-footnote">${t('logs_activity_desc', 'What NyxProps did at each boot stage: the backend it used, each preset it ran or skipped, every prop it changed, and any write that failed.')} ${t('logs_hint', 'The log is rewritten at every boot. Newest at the bottom. Tap refresh in the top bar to reload.')}<br><code>${LOG_PATH}</code></p>
 	`;
 }
 

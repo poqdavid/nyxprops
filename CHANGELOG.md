@@ -69,7 +69,8 @@ not need SuSFS.
 * **Settings:** prop backend, prop-area rebuild, the repeat master switch and
   resetprop-rs updates.
 * **Logs:** this boot's `props.log` — the backend used, each preset run or
-  skipped, and every prop changed — newest at the bottom.
+  skipped, every prop changed and any write that failed — newest at the
+  bottom.
 * **About:** theme, Material You, fullscreen, credits and license.
 * **Light on the manager:** one bundled script, one batched read on open,
   tab switches that don't touch the shell, and switches, dialogs and the

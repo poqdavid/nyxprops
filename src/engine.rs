@@ -12,6 +12,7 @@ pub struct Engine {
     pub logfile: String,
     pub moddir: String,
     touched: Vec<String>,
+    failed: Vec<String>,
 }
 
 pub struct Headers {
@@ -74,12 +75,42 @@ impl Engine {
             logfile,
             moddir,
             touched: Vec::new(),
+            failed: Vec::new(),
         }
     }
 
     pub fn log(&self, tag: &str, target: &str) {
         if !self.logfile.is_empty() {
             fsx::append_line(&self.logfile, &format!("[{tag}]: nyxprops {target}"));
+        }
+    }
+
+    /// Sets a prop. Logs `name=shown` and notes its area, or logs the failure.
+    fn write(&mut self, name: &str, value: &str, shown: &str) {
+        if self.be.set(name, value) {
+            self.log("prop", &format!("{name}={shown}"));
+            self.note_touched(name);
+        } else {
+            self.log_failed(&format!("{name}={shown}"));
+        }
+    }
+
+    /// Deletes a prop and logs it, or logs the failure. The caller notes the
+    /// area first, while the prop still exists to read its context from.
+    fn remove(&mut self, name: &str) {
+        if self.be.delete(name) {
+            self.log("prop", &format!("{name}=(deleted)"));
+        } else {
+            self.log_failed(&format!("{name}=(deleted)"));
+        }
+    }
+
+    /// Logs a failed write once per run: the repeat loop retries the same
+    /// write every tick, and the log shouldn't grow with each one.
+    fn log_failed(&mut self, what: &str) {
+        if !self.failed.iter().any(|f| f == what) {
+            self.log("prop_error", &format!("write failed: {what}"));
+            self.failed.push(what.to_string());
         }
     }
 
@@ -141,31 +172,26 @@ impl Engine {
                 }
                 let needle = rest[0];
                 let value = rest[1..].join(" ");
-                if self.be.get(name).contains(needle) && self.be.set(name, &value) {
-                    self.log("prop", &format!("{name}={value}"));
-                    self.note_touched(name);
+                if self.be.get(name).contains(needle) {
+                    self.write(name, &value, &value);
                 }
             }
             "clear" => {
-                if !self.be.get(name).is_empty() && self.be.set(name, "") {
-                    self.log("prop", &format!("{name}=(cleared)"));
-                    self.note_touched(name);
+                if !self.be.get(name).is_empty() {
+                    self.write(name, "", "(cleared)");
                 }
             }
             "delete" => {
                 if self.be.prop_exists(name) {
                     self.note_touched(name);
-                    if self.be.delete(name) {
-                        self.log("prop", &format!("{name}=(deleted)"));
-                    }
+                    self.remove(name);
                 }
             }
             "delete_matching" => self.delete_matching(name),
             "missing" => {
                 let value = rest.join(" ");
-                if self.be.get(name).is_empty() && self.be.set(name, &value) {
-                    self.log("prop", &format!("{name}={value}"));
-                    self.note_touched(name);
+                if self.be.get(name).is_empty() {
+                    self.write(name, &value, &value);
                 }
             }
             "replace" => {
@@ -184,25 +210,22 @@ impl Engine {
                     return;
                 }
                 let new = cur.replace(needle, &repl);
-                if new != cur && self.be.set(name, &new) {
-                    self.log("prop", &format!("{name}={new}"));
-                    self.note_touched(name);
+                if new != cur {
+                    self.write(name, &new, &new);
                 }
             }
             "reset" => {
                 let value = rest.join(" ");
                 let cur = self.be.get(name);
-                if !cur.is_empty() && cur != value && self.be.set(name, &value) {
-                    self.log("prop", &format!("{name}={value}"));
-                    self.note_touched(name);
+                if !cur.is_empty() && cur != value {
+                    self.write(name, &value, &value);
                 }
             }
             "missing_match" => {
                 let value = rest.join(" ");
                 let cur = self.be.get(name);
-                if (cur.is_empty() || cur != value) && self.be.set(name, &value) {
-                    self.log("prop", &format!("{name}={value}"));
-                    self.note_touched(name);
+                if cur.is_empty() || cur != value {
+                    self.write(name, &value, &value);
                 }
             }
             "same_as" => {
@@ -212,9 +235,8 @@ impl Engine {
                 }
                 let src = rest[0];
                 let sval = self.be.get(src);
-                if !sval.is_empty() && !self.be.get(name).is_empty() && self.be.set(name, &sval) {
-                    self.log("prop", &format!("{name}={sval}"));
-                    self.note_touched(name);
+                if !sval.is_empty() && !self.be.get(name).is_empty() {
+                    self.write(name, &sval, &sval);
                 }
             }
             other => self.log("prop_error", &format!("unknown mode '{other}' for '{name}'")),
@@ -233,9 +255,7 @@ impl Engine {
             if !ctx.is_empty() {
                 ctxs.push(ctx);
             }
-            if self.be.delete(m) {
-                self.log("prop", &format!("{m}=(deleted)"));
-            }
+            self.remove(m);
         }
         for c in ctxs {
             if !self.touched.iter().any(|t| t == &c) {
@@ -483,5 +503,27 @@ mod tests {
         assert_eq!(name_from_dump_line("[ro.y]: value").as_deref(), Some("ro.y"));
         assert_eq!(name_from_dump_line("[ro.z]:no-space"), None);
         assert_eq!(name_from_dump_line("junk"), None);
+    }
+
+    #[test]
+    fn failed_write_logged_once() {
+        let dir = std::env::temp_dir().join(format!("nyxprops-failed-{}", std::process::id()));
+        fsx::mkdir_p(&dir.to_string_lossy());
+        let logfile = dir.join("props.log").to_string_lossy().into_owned();
+        let be = Backend {
+            bin: None,
+            mode: crate::backend::Mode::Magisk,
+            init_warn: None,
+        };
+        let mut e = Engine::new(be, Dates::default(), String::new(), String::new(), logfile.clone(), String::new());
+        e.log_failed("ro.x=1");
+        e.log_failed("ro.y=(deleted)");
+        e.log_failed("ro.x=1");
+        let log = fsx::read_to_string(&logfile).unwrap_or_default();
+        let _ = std::fs::remove_dir_all(&dir);
+        assert_eq!(
+            log,
+            "[prop_error]: nyxprops write failed: ro.x=1\n[prop_error]: nyxprops write failed: ro.y=(deleted)\n"
+        );
     }
 }
