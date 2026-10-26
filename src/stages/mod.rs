@@ -30,8 +30,11 @@ pub fn config_path() -> String {
     format!("{}/config.sh", persist_dir())
 }
 
+/// Engine and config for a boot stage. Opens this boot's log first, so the
+/// backend warning below lands in it even when the stage starts a new log.
 pub fn setup(moddir: &str) -> (Engine, Vars) {
     let (engine, vars) = setup_quiet(moddir);
+    init_boot_log(&engine);
 
     if let Some(w) = &engine.be.init_warn {
         let tag = if w.starts_with("unknown prop_tool") {
@@ -81,7 +84,7 @@ pub(crate) fn read_vbmeta_size(config: &str) -> String {
     "8192".to_string()
 }
 
-pub fn init_boot_log(engine: &Engine) {
+fn init_boot_log(engine: &Engine) {
     let logfile = &engine.logfile;
     if logfile.is_empty() {
         return;

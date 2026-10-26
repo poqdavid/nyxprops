@@ -1,11 +1,10 @@
-use super::{count_presets, init_boot_log, props_dir, setup};
+use super::{count_presets, props_dir, setup};
 use crate::backend::Mode;
 use crate::{fsx, repeat};
 
 pub fn run(moddir: &str) {
     let props = props_dir();
     let (mut engine, vars) = setup(moddir);
-    init_boot_log(&engine);
     engine.apply_presets(&props, "boot-completed");
     if engine.be.needs_rebuild() {
         engine.rebuild_touched_areas(vars.get("hide_compact"));

@@ -57,7 +57,7 @@
     "/data/adb/ksu/nyxprops/logs/props.log": [
      "0o644",
      "0:0",
-     "nyxprops/boot: [logging_initialized]\n[boot_id]: nyxprops <boot_id>\n[prop_tool]: nyxprops magisk\n[prop_preset]: nyxprops 40-debuggable.prop\n[prop]: nyxprops ro.debuggable=0\n[prop]: nyxprops ro.secure=1\n[prop]: nyxprops ro.adb.secure=1\n[prop_preset]: nyxprops 50-build-type.prop\n[prop]: nyxprops ro.build.type=user\n[prop]: nyxprops ro.build.tags=release-keys\n[prop_preset_skipped]: nyxprops 52-security-patch.prop\n[prop_preset_skipped]: nyxprops 97-fingerprint.prop\n[prop_error]: nyxprops unknown hide_compact strategy 'sometimes', skipping rebuild\n"
+     "nyxprops/boot: [logging_initialized]\n[boot_id]: nyxprops <boot_id>\n[prop_tool]: nyxprops magisk\n[prop_error]: nyxprops unknown prop_tool 'bogus', using magisk resetprop\n[prop_preset]: nyxprops 40-debuggable.prop\n[prop]: nyxprops ro.debuggable=0\n[prop]: nyxprops ro.secure=1\n[prop]: nyxprops ro.adb.secure=1\n[prop_preset]: nyxprops 50-build-type.prop\n[prop]: nyxprops ro.build.type=user\n[prop]: nyxprops ro.build.tags=release-keys\n[prop_preset_skipped]: nyxprops 52-security-patch.prop\n[prop_preset_skipped]: nyxprops 97-fingerprint.prop\n[prop_error]: nyxprops unknown hide_compact strategy 'sometimes', skipping rebuild\n"
     ]
    },
    "removed": []
