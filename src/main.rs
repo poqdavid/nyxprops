@@ -3,8 +3,10 @@ mod config;
 mod dates;
 mod engine;
 mod fsx;
+mod json;
 mod repeat;
 mod stages;
+mod tee;
 mod text;
 mod tools;
 

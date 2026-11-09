@@ -10,6 +10,7 @@ Config-driven **device property spoofing** for **KernelSU / KernelSU-Next**, wit
 
 - 🧩 **21 shipped presets** (16 on by default): verified boot state and errors, AVB / vbmeta, warranty bit, debuggable / secure, mock location, build type, OEM unlock, recovery bootmode, ADB state, USB config, vendor-specific props (Xiaomi / Realme), emulator traces, encryption state and the crash-recovery counter, plus opt-in presets for security patch, build date, verified boot hash, build fingerprint and custom ROM props
 - 📝 **Plain-text rules**: `missing`, `reset`, `missing_match`, `contains`, `clear`, `delete`, `replace`, `delete_matching` and `same_as`, with `{avb_version}`, `{vbmeta_size}`, `{security_patch}`, `{yyyy_mm}` and `{vendor_patch}` value tokens
+- 🔐 **Patch dates that match the TEE**: `{security_patch}` and `{vendor_patch}` follow [Play Integrity Fork](https://github.com/osm0sis/PlayIntegrityFork)'s `SECURITY_PATCH` when it's installed, else the patch levels [TEESimulator](https://github.com/JingMatrix/TEESimulator) gives Google Play services, else the current month, so the properties and key attestation agree
 - ⏱️ **Stages and gates**: each preset runs at `post-fs-data` (before zygote — for build-identity props the framework caches, like the security patch level, fingerprint and build type), the `service` stage (default; it applies once Android has finished booting, so the system's own boot-time writes can't undo it), or `boot-completed` (KernelSU's boot-completed stage, which starts at that same moment), and can be limited to an Android API range with `min_sdk` / `max_sdk`
 - 🔁 **Optional repeat**: a preset with a `# repeat: N` header is re-applied every N seconds, for the rare prop something resets after boot (off for every shipped preset)
 - 🥷 **Two backends**: the stock KernelSU/Magisk `resetprop` (default) or the bundled **resetprop-rs** for stealth writes and count-preserving deletes
@@ -97,6 +98,8 @@ Changing system properties can confuse apps or the system itself. Please make su
 | **resetprop-rs**     | Enginex0          | [GitHub](https://github.com/Enginex0/resetprop-rs)       |
 | **BRENE**            | rrr333nnn333      | [GitHub](https://github.com/rrr333nnn333/BRENE)          |
 | **ksu_module_susfs** | sidex15           | [GitHub](https://github.com/sidex15/ksu_module_susfs)    |
+| **PlayIntegrityFork** | osm0sis          | [GitHub](https://github.com/osm0sis/PlayIntegrityFork)   |
+| **TEESimulator**     | JingMatrix        | [GitHub](https://github.com/JingMatrix/TEESimulator)     |
 
 *The set of props the presets cover follows BRENE's. See [NOTICE.md](NOTICE.md) for what comes from where.*
 

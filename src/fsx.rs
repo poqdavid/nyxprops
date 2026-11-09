@@ -20,6 +20,10 @@ pub fn is_dir(path: &str) -> bool {
     Path::new(path).is_dir()
 }
 
+pub fn exists(path: &str) -> bool {
+    Path::new(path).exists()
+}
+
 pub fn basename(path: &str) -> &str {
     let t = path.trim_end_matches('/');
     t.rsplit('/').next().unwrap_or(t)

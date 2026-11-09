@@ -13,6 +13,7 @@ pub struct Engine {
     pub moddir: String,
     touched: Vec<String>,
     failed: Vec<String>,
+    dates_logged: Vec<(&'static str, String)>,
 }
 
 pub struct Headers {
@@ -76,6 +77,7 @@ impl Engine {
             moddir,
             touched: Vec::new(),
             failed: Vec::new(),
+            dates_logged: Vec::new(),
         }
     }
 
@@ -111,6 +113,17 @@ impl Engine {
         if !self.failed.iter().any(|f| f == what) {
             self.log("prop_error", &format!("write failed: {what}"));
             self.failed.push(what.to_string());
+        }
+    }
+
+    /// Logs where the patch dates came from, the first time a preset uses
+    /// one and again if that changes.
+    fn log_dates(&mut self) {
+        if self.dates_logged != self.dates.notes {
+            for (tag, text) in &self.dates.notes {
+                self.log(tag, text);
+            }
+            self.dates_logged = self.dates.notes.clone();
         }
     }
 
@@ -328,6 +341,11 @@ impl Engine {
                 None => continue,
                 Some(f) if f.starts_with('#') => continue,
                 Some(_) => {}
+            }
+            if let OnSkip::Log = on_skip {
+                if raw.contains("{security_patch}") || raw.contains("{vendor_patch}") {
+                    self.log_dates();
+                }
             }
             let line = match self.resolve_tokens(raw.clone()) {
                 Ok(l) => l,

@@ -6,7 +6,7 @@ needs a phone.
 
 | Suite | What it checks | Run it |
 | --- | --- | --- |
-| Boot stages | The three stages of `bin/nyxprops` in 23 device scenarios: every `resetprop` / resetprop-rs / `getprop` / `date` call, every prop it changes and every file a stage writes, plus the repeat loop | `sudo python3 tests/boot/run.py --binary <static host build>` |
+| Boot stages | The three stages of `bin/nyxprops` in 27 device scenarios: every `resetprop` / resetprop-rs / `getprop` / `date` call, every prop it changes and every file a stage writes, plus the repeat loop | `sudo python3 tests/boot/run.py --binary <static host build>` |
 | WebUI | Every page, setting write, preset switch, edit, new and delete, theme, fullscreen and resetprop-rs check, plus bridge behaviour and system-bar padding | `npm run test:webui` |
 | Installer | `customize.sh` picks the engine for the device's ABI, refuses what it can't run, checks the zip's integrity, sets up resetprop-rs, and keeps or resets settings on an upgrade | `python3 scripts/test-install.py` |
 
@@ -24,7 +24,10 @@ The scenarios cover the stock, `rs` and `auto` backends (with resetprop-rs
 working, missing and broken), every `hide_compact` value and rebuild errors,
 SDK gates, a device that needs no changes, a missing `config.sh` or props
 directory, odd config values, the `{security_patch}` / `{vendor_patch}` dates
-(including the roll-back before the 5th and an unreadable clock), custom
+(from the clock, with the roll-back before the 5th and an unreadable clock;
+from Play Integrity Fork's config; and from TEESimulator's profile for Play
+services or its harvested levels, with Play Integrity Fork disabled, missing a
+date or disagreeing), custom
 presets with every rule mode and the usual mistakes, failing `resetprop`
 calls, and the repeat loop: it must put back a prop that reverts, and stop
 when the master switch is turned off.

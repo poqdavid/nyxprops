@@ -240,6 +240,25 @@ CUSTOM = {
 
 REPEAT_PRESET = "# name: Repeat\n# enabled: 1\n# repeat: 1\n\nreset ro.allow.mock.location 0\n"
 
+# The modules {security_patch} / {vendor_patch} follow: Play Integrity Fork's
+# config, and TEESimulator's config and harvest. A path ending in / is a
+# directory.
+PIF_DIR = "/data/adb/modules/playintegrityfix"
+PIF_PROP = (
+    "MANUFACTURER=Google\nMODEL=Pixel\nSECURITY_PATCH=2025-10-05\n"
+    "#ro.build.version.security_patch=2025-10-05\nspoofBuild=1\n"
+)
+SIM_DIR = "/data/adb/modules/teesim/"
+SIM_CONFIG = "/data/adb/teesim/config.json"
+SIM_HARVEST = "/data/adb/teesim/harvested.json"
+HARVEST = '{\n  "version": 3,\n  "osPatchLevel": 202509,\n  "vendorPatchLevel": 20250905\n}\n'
+
+
+def sim_config(system, vendor, apps):
+    profile = {"keybox": "keybox.xml", "mode": "patch", "patchLevel": {"system": system, "vendor": vendor, "boot": "YYYY-MM-05"}, "apps": apps}
+    return json.dumps({"version": 1, "profiles": {"other": {"keybox": "keybox.xml", "apps": ["com.example.bank"]}, "play": profile}}, indent=2) + "\n"
+
+
 # name -> dict(config overrides, presets to enable/disable/add, device props, fixture tweaks)
 SCENARIOS = {
     "default": {},
@@ -265,6 +284,17 @@ SCENARIOS = {
     "failures": {"fail": ["resetprop -n ro.secure 1", "resetprop -d ro.boot.verifiedbooterror", "resetprop -n ro.crypto.state encrypted"]},
     "repeat": {"config": {"repeat_min_interval": "1"}, "add": {"45-repeat.prop": REPEAT_PRESET}, "repeat": True},
     "repeat-off": {"config": {"repeat_enabled": "0", "repeat_min_interval": "1"}, "add": {"45-repeat.prop": REPEAT_PRESET}},
+    "pif": {"enable": ["52-security-patch.prop"], "add": {"77-tokens.prop": CUSTOM["77-tokens.prop"]},
+            "files": {f"{PIF_DIR}/custom.pif.prop": PIF_PROP, f"{PIF_DIR}/pif.json": '{"SECURITY_PATCH": "2024-06-05"}\n'}},
+    "pif-teesim": {"enable": ["52-security-patch.prop"],
+                   "files": {f"{PIF_DIR}/custom.pif.prop": PIF_PROP, SIM_DIR: "",
+                             SIM_CONFIG: sim_config("today", "YYYY-MM-05", ["com.google.android.gms", "com.android.vending"])}},
+    "teesim": {"enable": ["52-security-patch.prop"], "add": {"77-tokens.prop": CUSTOM["77-tokens.prop"]}, "date": "2026-11-03",
+               "files": {f"{PIF_DIR}/custom.pif.prop": "SECURITY_PATCH=\n", SIM_DIR: "",
+                         SIM_CONFIG: sim_config("2025-11-05", "YYYY-MM-05", ["com.google.android.gms"])}},
+    "teesim-harvested": {"enable": ["52-security-patch.prop"],
+                         "files": {f"{PIF_DIR}/custom.pif.prop": PIF_PROP, f"{PIF_DIR}/disable": "", SIM_DIR: "",
+                                   SIM_CONFIG: sim_config("today", "today", ["com.android.vending"]), SIM_HARVEST: HARVEST}},
 }
 
 
@@ -362,6 +392,12 @@ def build_root(root, module_dir, binary, sc):
         write(f"{fx}/rebuild_error", sc["rebuild_error"])
     if not sc.get("repeat"):
         write(f"{root}/proc/sys/kernel/random/boot_id", BOOT_ID + "\n")
+    # Other modules' files.
+    for path, text in sc.get("files", {}).items():
+        if path.endswith("/"):
+            mkdir(root + path)
+        else:
+            write(root + path, text)
 
 
 def props_of(root):

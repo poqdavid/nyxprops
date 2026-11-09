@@ -71,9 +71,11 @@ const NEW_PRESET_TEMPLATE = `# name: My preset
 #
 # Value tokens (resolved when the preset is applied):
 #   {avb_version}     device AVB version     {vbmeta_size}   configured vbmeta size
-#   {security_patch}  current YYYY-MM-01     {yyyy_mm}       current YYYY-MM
-#   {vendor_patch}    current YYYY-MM-05, rolled back a month until the 5th
-#                     arrives, so it never names a future date
+#   {security_patch}  OS patch date          {yyyy_mm}       current YYYY-MM
+#   {vendor_patch}    vendor patch date
+#   The patch dates match the TEE: Play Integrity Fork's SECURITY_PATCH,
+#   else TEESimulator's levels for Google Play services, else the current
+#   YYYY-MM-01 / YYYY-MM-05 (the 5th rolled back a month until it arrives).
 
 # reset  ro.example.prop  somevalue
 `;

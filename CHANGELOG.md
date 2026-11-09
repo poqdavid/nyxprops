@@ -18,11 +18,21 @@ not need SuSFS.
   hash, build fingerprint and custom-ROM props.
 * **Plain-text rules:** `missing`, `reset`, `missing_match`, `contains`,
   `clear`, `delete`, `replace`, `delete_matching` and `same_as`.
-* **Value tokens:** `{avb_version}`, `{vbmeta_size}`, `{security_patch}`
-  (current `YYYY-MM-01`), `{yyyy_mm}` and `{vendor_patch}` — the current
-  month's `YYYY-MM-05`, stepped back a month until the 5th arrives so the
-  vendor patch date never runs ahead of the calendar. Dates are computed
-  on-device from the clock, with no network or external file.
+* **Value tokens:** `{avb_version}`, `{vbmeta_size}`, `{security_patch}`,
+  `{yyyy_mm}` (the current month) and `{vendor_patch}`.
+* **Patch dates that match the TEE:** `{security_patch}` and `{vendor_patch}`
+  follow the patch levels key attestation reports, so the properties and the
+  TEE agree. With [Play Integrity Fork](https://github.com/osm0sis/PlayIntegrityFork)
+  installed, both are its `SECURITY_PATCH`, read from the config it loads.
+  Otherwise, with [TEESimulator](https://github.com/JingMatrix/TEESimulator),
+  they are the system and vendor levels of the profile that serves Google
+  Play services, resolved as TEESimulator resolves them, or the levels it
+  harvested from the real TEE when no profile serves it. Without either, or
+  for a level neither gives, the dates come from the clock: `YYYY-MM-01` and
+  `YYYY-MM-05`, the 5th stepped back a month until it arrives, so the vendor
+  date never runs ahead of the calendar. The log says where each date came
+  from and warns when TEESimulator disagrees with Play Integrity Fork. All
+  of it is read on-device, with no network.
 * **Stages:** each preset runs at `post-fs-data`, `service` (the default) or
   `boot-completed`. `post-fs-data` runs before zygote, which matters for
   build-identity props the framework reads once into `android.os.Build`
@@ -106,12 +116,11 @@ not need SuSFS.
 ### 📝 Notes
 
 * Changes to presets and settings take effect on the next reboot.
-* The security patch presets only make the **properties** current and
-  self-consistent. Hardware key attestation's `osPatchLevel` /
-  `vendorPatchLevel` live in the TEE and can't be changed by any property. A
-  keystore spoofer (TrickyStore, OhMyKeymint, TEESimulator) set to present
-  the system property mirrors whatever these props hold; one pinned to a
-  fixed date should be matched by editing the preset's values.
+* The security patch preset changes the **properties**, never the TEE.
+  Key attestation's `osPatchLevel` / `vendorPatchLevel` come from the TEE or
+  a keystore spoofer, which is why the dates follow Play Integrity Fork and
+  TEESimulator. With another spoofer (TrickyStore, OhMyKeymint) pinned to a
+  fixed date, match it by editing the preset's values.
 * Build-identity spoofing is only as consistent as the values: a security
   patch newer than the build fingerprint, or a vendor patch that disagrees,
   is still a flag.
